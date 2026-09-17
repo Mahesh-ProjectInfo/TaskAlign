@@ -1,0 +1,62 @@
+8. BUSINESS RULE ENGINE
+8.1 Module Overview
+The Business Rule Engine is responsible for validating and preparing assignment data after the Assignment Manager initiates the assignment generation process. It evaluates the assignment configuration against predefined business rules to determine whether the selected resources are eligible to perform the defined tasks.
+The module analyses the relationship between tasks, required skills, selected resources, and assignment constraints to identify the resources that satisfy the assignment requirements. It also prepares the validated data required for cost evaluation and for optimization matrix preparation before forwarding it to the Matrix Generation Module.
+By ensuring that only eligible and validated information is processed, the Business Rule Engine improves the accuracy and reliability of the assignment optimization process.
+________________________________________
+8.2 Skill Matching
+This feature evaluates whether the skills possessed by the selected resources satisfy the skill requirements defined for each task.
+For every task included in the assignment, the system compares the required skills with the skills associated with each selected resource. Resources that satisfy the required skill criteria are considered eligible for further evaluation.
+Process
+•	Retrieve the required skills for each task.
+•	Retrieve the skills associated with the selected resources.
+•	Compare the required skills with the resource skills.
+•	Identify resources that satisfy the required skill requirements.
+•	Forward the eligible resources for further processing.
+________________________________________
+8.3 Eligible Resource Identification
+This feature identifies the resources that are eligible to perform each task after successful skill matching.
+The system evaluates all selected resources and prepares a list of eligible resources for every task. Resources that do not satisfy the required skills are excluded from subsequent processing.
+The resulting eligible resource list serves as the input for preparing the optimization matrices.
+Process
+•	Receive the skill matching results.
+•	Identify eligible resources for each task.
+•	Exclude resources that fail the eligibility criteria.
+•	Prepare the eligible resource list.
+•	Forward the validated data for matrix preparation.
+________________________________________
+8.4 Cost Matrix Preparation
+This feature prepares the information required to generate the Cost Matrix.
+For every eligible resource-task combination, the system determines the cost-related values using the resource information and assignment constraints maintained within the system.
+The prepared data is forwarded to the Matrix Generation Module for constructing the Cost Matrix.
+Process
+•	Retrieve the eligible resources.
+•	Retrieve the monthly salary of each eligible resource.
+•	Retrieve the estimated duration of each task.
+•	Retrieve the assignment constraints.
+•	Prepare the cost-related values.
+•	Forward the prepared data to the Matrix Generation Module.
+________________________________________
+8.5 Profit Matrix Preparation
+This feature is performed by the Business Rule Engine to generate the Optimization Matrix required for Profit Maximization.
+For every eligible resource-task combination, the Business Rule Engine evaluates the relevant resource and task information and produces the corresponding optimization matrix value. The internal scoring mechanism used by the Business Rule Engine to derive these values is an implementation detail and is outside the scope of this SRS.
+These values serve solely as input to the Hungarian Algorithm and do not themselves represent financial profit. Performance Rating is not used as the optimization criterion.
+The generated Optimization Matrix is forwarded to the Matrix Generation Module for structuring and presentation.
+Process
+•	Retrieve the eligible resources.
+•	Retrieve the relevant resource and task information.
+•	Generate the optimization matrix value for each eligible resource-task combination.
+•	Forward the generated Optimization Matrix to the Matrix Generation Module.
+________________________________________
+8.6 Business Rules
+Assignment processing shall begin only after successful assignment generation.
+Only validated assignments shall be processed by the Business Rule Engine.
+Only selected resources shall participate in business rule evaluation.
+Every task shall specify at least one required skill.
+Every selected resource shall possess at least one registered skill.
+Resource eligibility shall be determined by comparing resource skills with task skill requirements.
+Resources that do not satisfy the required skill criteria shall be excluded from further processing.
+Only eligible resources shall be considered for cost and optimization value evaluation.
+Cost-related information shall be prepared using validated resource and assignment data.
+Optimization-related information for Profit Maximization shall be prepared using validated resource and task information.
+The validated data prepared by the Business Rule Engine shall be forwarded to the Matrix Generation Module for matrix construction.

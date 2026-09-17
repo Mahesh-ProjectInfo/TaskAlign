@@ -1,0 +1,2985 @@
+﻿Database Name
+task_align_db
+
+Total Tables : 11 
+Authentication : 1 
+Master Data : 5 
+Assignment Management : 5 
+Normalization : Third Normal Form (3NF)
+
+Authentication
+Users 
+Master Data
+Assignment Types 
+Roles 
+Skills 
+Resources 
+Resource Skills 
+Assignment Management
+Assignments 
+Assignment Resources 
+Tasks 
+Task Skills 
+Assignment Constraints 
+
+
+
+
+
+
+
+Table 1: users
+Module
+Authentication
+
+Purpose
+The users table stores the account information of Assignment Managers who are authorized to access the Task Align system.
+It supports the following functionalities:
+User Registration 
+Email Login 
+Mobile Login 
+Forgot Password (SMTP + OTP) 
+Change Password 
+Edit Profile 
+Assignment Ownership 
+Since OTPs are stored temporarily in a HashMap and sent via SMTP, no OTP information is stored in this table.
+
+Table Structure
+Column Name
+Data Type
+Constraints
+Description
+user_id
+BIGINT
+Primary Key, Auto Increment
+Unique identifier for each user.
+full_name
+VARCHAR(100)
+NOT NULL
+Stores the full name of the Assignment Manager.
+email
+VARCHAR(100)
+UNIQUE, NOT NULL
+Stores the email address used for Email Login and Forgot Password.
+mobile_number
+VARCHAR(15)
+UNIQUE, NOT NULL
+Stores the mobile number used for Mobile Login.
+password
+VARCHAR(255)
+NOT NULL
+Stores the BCrypt encrypted password.
+profile_picture
+VARCHAR(255)
+NULL
+Stores the uploaded profile picture path.
+is_deleted
+BOOLEAN
+DEFAULT FALSE
+Indicates whether the user has been soft deleted.
+created_at
+TIMESTAMP
+DEFAULT CURRENT_TIMESTAMP
+Stores the date and time when the record was created.
+updated_at
+TIMESTAMP
+DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+Stores the last modification date and time.
+
+Explanation of Each Field
+user_id
+Unique identifier for every user. 
+Used as the Primary Key. 
+Referenced by multiple tables using foreign keys. 
+Mapped to Long in Spring Boot. 
+
+full_name
+Stores the user's full name.
+Displayed in the Dashboard, Profile and generated PDF/Excel reports.
+email
+Used for Email Login. 
+Used for Forgot Password. 
+Must be unique. 
+
+mobile_number
+Used for Mobile Login. 
+Must be unique. 
+Stored as VARCHAR because mobile numbers are identifiers, not numeric values. 
+
+password
+Stores the encrypted BCrypt password. 
+Plain-text passwords are never stored. 
+
+profile_picture
+Stores only the file path or filename. 
+The actual image is stored in the file system. 
+
+is_deleted
+Supports soft delete. 
+Deleted users remain in the database for historical reference but cannot access the application. 
+
+created_at
+Stores the record creation timestamp. 
+Used for auditing and reporting. 
+
+updated_at
+Stores the last modification timestamp. 
+Automatically updated whenever the record is modified. 
+
+Primary Key
+Column
+user_id
+
+Foreign Keys
+None
+The users table is a parent table referenced by other tables.
+
+Database Relationships
+Parent Table
+Child Table
+Relationship
+users
+assignments
+One-to-Many
+
+Relationship Diagram
+users (1)
+   â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€< assignments (Many)
+   
+
+Spring Data JPA Mapping
+User Entity
+@OneToMany(mappedBy = "user")
+private List<Assignment> assignments;
+
+Assignment Entity
+
+@ManyToOne
+@JoinColumn(name = "user_id")
+private User user;
+Used By Forms
+Form
+Purpose
+Register
+Creates a new user account.
+Login
+Authenticates the user.
+Forgot Password
+Finds the user by email before OTP verification.
+Edit Profile
+Updates user profile information.
+Change Password
+Updates the encrypted password.
+
+Business Rules
+Every user must have a unique email address. 
+Every user must have a unique mobile number. 
+Passwords must always be stored in BCrypt encrypted format. 
+Email address cannot be modified after registration. 
+Soft-deleted users cannot log in. 
+OTPs are not stored in the database; they are maintained temporarily in an in-memory HashMap and delivered through SMTP. 
+
+Dummy Data
+user_id
+full_name
+email
+mobile_number
+password
+profile_picture
+is_deleted
+1
+Mahesh Kumar
+mahesh@gmail.com
+9876543210
+$2a$10$AbCdEf...
+mahesh.jpg
+FALSE
+2
+Rahul Sharma
+rahul@gmail.com
+9123456780
+$2a$10$XyZaBc...
+rahul.jpg
+FALSE
+
+Why This Design? (Architectural Reasoning)
+Why don't we store OTP?
+OTP is temporary data. It is generated during password reset, stored in an in-memory HashMap, sent using SMTP, and discarded after verification or expiration. Persisting it in the database would add unnecessary complexity without business value.
+
+Why store the profile picture path instead of the image?
+Images are stored in the file system, while the database stores only the file path. This keeps the database lightweight and improves performance.
+
+Why use TIMESTAMP?
+created_at and updated_at are audit fields. Using TIMESTAMP with Spring Data JPA (LocalDateTime) provides automatic timestamp management and aligns well with MySQL and Hibernate.
+
+Why use soft delete?
+Soft delete preserves assignments and historical assignment data while preventing deleted users from accessing the application.
+Final Verdict
+The users table is fully normalized (3NF), optimized for Spring Boot, Spring Data JPA, MySQL, Spring Security, JWT Authentication, SMTP-based password reset, JasperReports, and Apache POI. It provides a clean foundation for the authentication module while remaining scalable and easy to maintain.
+
+
+
+Table 2:  Assignment Types
+Module
+Master Data
+
+Purpose
+The assignment_types table stores the different categories of assignments supported by the Task Align system.
+An Assignment Type acts as the parent entity for Roles, Skills, Resources, and Assignments. It ensures that all master data and assignment information are organized according to a specific business domain.
+Examples of Assignment Types include:
+Software Project Assignment 
+Manufacturing Job Assignment 
+Construction Project Assignment 
+Sales Region Assignment 
+These values are created once and reused throughout the application.
+
+Table Structure
+Column Name
+Data Type
+Constraints
+Description
+assignment_type_id
+BIGINT
+Primary Key, Auto Increment
+Unique identifier for each assignment type.
+assignment_type_name
+VARCHAR(100)
+UNIQUE, NOT NULL
+Stores the name of the assignment type (e.g., Software Project Assignment).
+created_by
+BIGINT
+Foreign Key, NOT NULL
+References the user who created the assignment type.
+updated_by
+BIGINT
+Foreign Key
+References the user who last updated the assignment type.
+created_at
+TIMESTAMP
+DEFAULT CURRENT_TIMESTAMP
+Stores the record creation timestamp.
+updated_at
+TIMESTAMP
+DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+Stores the last modification timestamp.
+is_deleted
+BOOLEAN
+DEFAULT FALSE
+Indicates whether the assignment type has been soft deleted.
+
+Explanation of Each Field
+assignment_type_id
+Unique identifier for every Assignment Type. 
+Used as the Primary Key. 
+Referenced by multiple tables using foreign keys. 
+
+assignment_type_name
+Stores the name of the Assignment Type.
+Examples:
+Software Project Assignment 
+Manufacturing Job Assignment 
+Construction Project Assignment 
+Sales Region Assignment 
+This value is selected by the Assignment Manager while creating a new assignment.
+It is also used to categorize Roles, Skills, and Resources.
+This field must be unique.
+
+created_by
+Stores the User ID of the Assignment Manager who created the Assignment Type.
+This field helps maintain audit information.
+Example:
+Mahesh Kumar created "Software Project Assignment"
+Instead of storing the user's name, the system stores the corresponding user_id.
+
+updated_by
+Stores the User ID of the Assignment Manager who last modified the Assignment Type.
+Example:
+Rahul Sharma updated the Assignment Type.
+created_at
+Stores the date and time when the Assignment Type was created.
+Used for:
+Audit
+Reports
+Record History
+updated_at
+Stores the last modification timestamp.
+Automatically updated whenever the Assignment Type is modified.
+
+is_deleted
+Supports Soft Delete.
+Instead of permanently deleting an Assignment Type, the system marks it as deleted.
+This prevents existing assignments from losing their relationship with the Assignment Type.
+
+Primary Key
+Column
+assignment_type_id
+
+Foreign Keys
+Column
+References
+created_by
+users.user_id
+updated_by
+users.user_id
+
+Database Relationships
+Parent Table
+Child Table
+Relationship
+assignment_types
+roles
+One-to-Many
+assignment_types
+skills
+One-to-Many
+assignment_types
+resources
+One-to-Many
+assignment_types
+assignments
+One-to-Many
+users
+assignment_types (created_by)
+One-to-Many
+users
+assignment_types (updated_by)
+One-to-Many
+
+Relationship Diagram
+
+users (1)
+   â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€< assignment_types (created_by)
+   â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€< assignment_types (updated_by)
+
+assignment_types (1)
+        â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€< roles (Many)
+        â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€< skills (Many)
+        â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€< resources (Many)
+        â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€< assignments (Many)
+
+Spring Data JPA Mapping
+AssignmentType Entity
+@ManyToOne
+@JoinColumn(name = "created_by")
+private User createdBy;
+@ManyToOne
+@JoinColumn(name = "updated_by")
+private User updatedBy;
+@OneToMany(mappedBy = "assignmentType")
+private List<Role> roles;
+@OneToMany(mappedBy = "assignmentType")
+private List<Skill> skills;
+@OneToMany(mappedBy = "assignmentType")
+private List<Resource> resources;
+@OneToMany(mappedBy = "assignmentType")
+private List<Assignment> assignments;
+Role Entity
+@ManyToOne
+@JoinColumn(name = "assignment_type_id")
+private AssignmentType assignmentType;
+Skill Entity
+@ManyToOne
+@JoinColumn(name = "assignment_type_id")
+private AssignmentType assignmentType;
+
+Resource Entity
+@ManyToOne
+@JoinColumn(name = "assignment_type_id")
+private AssignmentType assignmentType;
+Assignment Entity
+@ManyToOne
+@JoinColumn(name = "assignment_type_id")
+private AssignmentType assignmentType;
+
+Used By Forms
+Form
+Purpose
+Assignment Type Master
+Create, update, and manage Assignment Types.
+Role Master
+Loads Assignment Types to categorize roles.
+Skill Master
+Loads Assignment Types to categorize skills.
+Resource Management
+Loads Assignment Types to categorize resources.
+Create Assignment â€“ Assignment Details
+Allows the Assignment Manager to select an Assignment Type.
+
+Business Rules
+Assignment Type Name must be unique. 
+Assignment Type Name is mandatory. 
+Assignment Type must be created before Roles, Skills, or Resources can be added. 
+Soft-deleted Assignment Types cannot be selected while creating new assignments. 
+Existing assignments continue to reference the Assignment Type even after it is soft deleted. 
+The system stores the creator and last modifier of every Assignment Type for auditing purposes. 
+
+
+
+
+Dummy Data
+assignment_type_id
+assignment_type_name
+created_by
+updated_by
+is_deleted
+1
+Software Project Assignment
+1
+1
+FALSE
+2
+Manufacturing Job Assignment
+1
+2
+FALSE
+3
+Construction Project Assignment
+1
+1
+FALSE
+4
+Sales Region Assignment
+2
+2
+FALSE
+
+Why This Design? (Architectural Reasoning)
+Why create a separate Assignment Types table?
+Assignment Types are reusable master data. Storing them once avoids duplication across Roles, Skills, Resources, and Assignments, ensuring consistency throughout the application.
+
+Why don't we store Assignment Names here?
+An Assignment Type defines the category (e.g., Software Project Assignment), whereas an Assignment Name (e.g., Employee Payroll System) is created each time a new assignment is added.
+Therefore:
+Assignment Types belong in this master table. 
+Assignment Names belong in the assignments table. 
+This establishes a One-to-Many relationship:
+Software Project Assignment
+        â”‚
+        â”œâ”€â”€ Employee Payroll System
+        â”œâ”€â”€ Hospital Management System
+        â”œâ”€â”€ Banking Portal
+        â””â”€â”€ Inventory Management System
+
+Why include created_by and updated_by?
+These fields provide complete auditability by recording who created and last modified the Assignment Type. This is a common enterprise requirement that helps maintain accountability and traceability of master data changes.
+Why use Soft Delete?
+Soft delete prevents accidental removal of Assignment Types that are already referenced by Assignments, Roles, Skills, or Resources, preserving historical data and referential integrity.
+
+Overall Design Justification
+The assignment_types table acts as the foundation of the Master Data module. It centralizes reusable assignment categories, maintains referential integrity, supports auditing through created_by and updated_by, and is fully compatible with Spring Boot, Spring Data JPA, MySQL, JasperReports, and Apache POI. It follows Third Normal Form (3NF) and is designed to scale as new assignment categories are introduced in the future.
+
+
+
+
+Table 3: Roles
+1 Module
+Master Data
+
+Purpose
+The roles table stores reusable job roles for each Assignment Type.
+Role represents the job designation assigned to a Resource. Each Role belongs to one Assignment Type and can be assigned to multiple Resources.
+This table centralizes role information, eliminates duplicate role names, and ensures Resources are categorized correctly according to the selected Assignment Type.
+
+
+
+Examples
+Software Project Assignment
+Project Manager 
+Backend Developer 
+Frontend Developer 
+QA Engineer 
+Manufacturing Job Assignment
+Machine Operator 
+Supervisor 
+Quality Inspector 
+Construction Project Assignment
+Civil Engineer 
+Mason 
+Electrician 
+Carpenter 
+Sales Region Assignment
+Sales Executive 
+Territory Manager 
+Sales Manager 
+
+Table Structure
+Column Name
+Data Type
+Constraints
+Description
+role_id
+BIGINT
+Primary Key, Auto Increment
+Unique identifier for each role.
+assignment_type_id
+BIGINT
+Foreign Key, NOT NULL
+References the Assignment Type to which the role belongs.
+role_name
+VARCHAR(100)
+NOT NULL
+Stores the name of the role.
+created_by
+BIGINT
+Foreign Key, NOT NULL
+References the Assignment Manager who created the role.
+updated_by
+BIGINT
+Foreign Key
+References the Assignment Manager who last updated the role.
+created_at
+TIMESTAMP
+DEFAULT CURRENT_TIMESTAMP
+Stores the record creation timestamp.
+updated_at
+TIMESTAMP
+DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+Stores the last modification timestamp.
+is_deleted
+BOOLEAN
+DEFAULT FALSE
+Indicates whether the role has been soft deleted.
+
+Explanation of Each Field
+role_id
+Purpose
+Uniquely identifies each Role.
+Why BIGINT?
+Supports a large number of records. 
+Compatible with Spring Data JPA (Long). 
+Standard primary key used throughout the application. 
+Why Primary Key?
+Every Role must have a unique identifier.
+
+assignment_type_id
+Purpose
+Identifies the Assignment Type to which the Role belongs.
+Example
+Software Project Assignment
+        â†“
+Backend Developer
+Why BIGINT?
+Matches the Primary Key data type of the assignment_types table.
+Why Foreign Key?
+Ensures that every Role belongs to a valid Assignment Type and maintains referential integrity.
+role_name
+Purpose
+Stores the name of the Role.
+Examples:
+Backend Developer 
+Project Manager 
+QA Engineer 
+Civil Engineer 
+Sales Executive 
+Why VARCHAR(100)?
+Role names are short textual values. VARCHAR(100) provides sufficient storage while remaining efficient.
+Why NOT NULL?
+Every Role must have a valid name.
+created_by
+Purpose
+References the Assignment Manager who created the Role.
+Why BIGINT?
+Matches the Primary Key data type of the users table.
+Why Foreign Key?
+Maintains audit information by identifying who created the record.
+
+
+
+updated_by
+Purpose
+References the Assignment Manager who last modified the Role.
+Why BIGINT?
+Matches the Primary Key data type of the users table.
+Why Foreign Key?
+Maintains audit information by identifying who last updated the record.
+
+created_at
+Purpose
+Stores the date and time when the Role was created.
+Why TIMESTAMP?
+TIMESTAMP is ideal for audit fields and integrates well with Spring Data JPA (LocalDateTime).
+
+updated_at
+Purpose
+Stores the last modification date and time.
+Why TIMESTAMP?
+Automatically updated whenever the record is modified.
+
+is_deleted
+Purpose
+Supports Soft Delete.
+Instead of permanently deleting a Role, the system marks it as deleted.
+Why BOOLEAN?
+Only two states are required:
+FALSE â†’ Active 
+TRUE â†’ Deleted 
+
+Why Soft Delete?
+Resources and historical Assignments may still reference the Role. Soft delete preserves referential integrity while preventing the Role from being used in future records.
+
+Primary Key
+Column
+role_id
+
+Foreign Keys
+Column
+References
+Relationship
+assignment_type_id
+assignment_types.assignment_type_id
+Many-to-One
+created_by
+users.user_id
+Many-to-One
+updated_by
+users.user_id
+Many-to-One
+
+Database Relationships
+Parent Table
+Child Table
+Relationship
+assignment_types
+roles
+One-to-Many
+roles
+resources
+One-to-Many
+users
+roles (created_by)
+One-to-Many
+users
+roles (updated_by)
+One-to-Many
+
+Relationship Diagram
+users (1)
+   â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€< roles (created_by)
+   â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€< roles (updated_by)
+
+assignment_types (1)
+        â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€< roles (Many)
+
+roles (1)
+      â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€< resources (Many)
+
+Spring Data JPA Mapping
+Role Entity
+@ManyToOne
+@JoinColumn(name = "assignment_type_id")
+private AssignmentType assignmentType;
+
+@ManyToOne
+@JoinColumn(name = "created_by")
+private User createdBy;
+
+@ManyToOne
+@JoinColumn(name = "updated_by")
+private User updatedBy;
+
+@OneToMany(mappedBy = "role")
+private List<Resource> resources;
+Resource Entity
+@ManyToOne
+@JoinColumn(name = "role_id")
+private Role role;
+Why @ManyToOne?
+A Role belongs to exactly one Assignment Type, while one Assignment Type can have multiple Roles.
+Similarly, each Role is created and updated by one Assignment Manager.
+Why @OneToMany?
+One Role can be assigned to multiple Resources, whereas each Resource belongs to only one Role.
+
+Used By Forms
+Form
+Purpose
+Role Master
+Create, Update, View, and Delete Roles.
+Resource Management
+Loads Roles based on the selected Assignment Type.
+Create Assignment â€“ Select Resources
+Displays the assigned Role for each Resource.
+Assignment Results Screen
+Displays the assigned Resource's Role.
+
+Business Rules
+Every Role must belong to exactly one Assignment Type. 
+Assignment Type is mandatory before creating a Role. 
+Role Name is mandatory. 
+Role Names must be unique within the same Assignment Type. 
+Soft-deleted Roles cannot be assigned to new Resources. 
+Existing Resources continue to reference a soft-deleted Role. 
+Every create and update operation records the responsible Assignment Manager. 
+
+Dummy Data
+role_id
+assignment_type_id
+role_name
+created_by
+updated_by
+created_at
+updated_at
+is_deleted
+1
+1
+Project Manager
+1
+1
+2026-07-20 09:00:00
+2026-07-20 09:00:00
+FALSE
+2
+1
+Backend Developer
+1
+1
+2026-07-20 09:10:00
+2026-07-20 09:10:00
+FALSE
+3
+1
+Frontend Developer
+1
+2
+2026-07-20 09:20:00
+2026-07-22 11:30:00
+FALSE
+4
+2
+Machine Operator
+2
+2
+2026-07-20 10:00:00
+2026-07-20 10:00:00
+FALSE
+5
+3
+Civil Engineer
+1
+1
+2026-07-20 10:30:00
+2026-07-20 10:30:00
+FALSE
+6
+4
+Sales Executive
+2
+2
+2026-07-20 11:00:00
+2026-07-20 11:00:00
+FALSE
+
+Why This Design? (Architectural Reasoning)
+Why create a separate Roles table?
+Roles are reusable master data. Multiple Resources can share the same Role, so storing Roles in a separate table eliminates duplication and ensures consistency across the system.
+
+Why relate Roles to Assignment Types?
+Roles are specific to a business domain.
+For example:
+Backend Developer belongs to Software Project Assignment. 
+Civil Engineer belongs to Construction Project Assignment. 
+This relationship ensures that only relevant Roles are available when creating Resources or Assignments for a selected Assignment Type.
+
+Why doesn't this table include a Description field?
+The current application UI only requires Assignment Type and Role Name for creating and managing Roles. Role names are self-explanatory (e.g., Backend Developer, QA Engineer, Machine Operator), making a separate Description field unnecessary. Removing it simplifies both the database and the user interface.
+
+Why include created_by and updated_by?
+These fields provide complete auditability by recording who created and last modified each Role.
+
+Why use Soft Delete?
+Soft delete preserves historical relationships with Resources and Assignments while preventing deleted Roles from being assigned to new Resources.
+
+Overall Design Justification
+The roles table centralizes reusable job roles, categorizes them by Assignment Type, supports auditing, and enables efficient reuse across Resources. The design follows Third Normal Form (3NF) and is fully compatible with Spring Boot, Spring Data JPA, MySQL, JasperReports, and Apache POI. It provides a scalable, maintainable, and enterprise-ready foundation for the Role Master module.
+Top of Form
+
+
+Table 4: Skills
+1. Module
+Master Data
+
+2. Purpose
+The skills table stores reusable skills for each Assignment Type.
+A Skill represents the competency or expertise required to perform a task or possessed by a resource. Each Skill belongs to one Assignment Type and can be assigned to multiple Resources and multiple Tasks.
+The Business Rule Engine compares the Skills required by a Task with the Skills possessed by a Resource to determine resource eligibility.
+Examples
+Software Project Assignment
+Java 
+Spring Boot 
+React 
+MySQL 
+REST API 
+Manufacturing Job Assignment
+Machine Operation 
+Assembly 
+Quality Inspection 
+Construction Project Assignment
+Brick Work 
+Plumbing 
+Electrical Wiring 
+Sales Region Assignment
+Product Knowledge 
+Customer Communication 
+Negotiation 
+
+3. Table Structure
+Column Name
+Data Type
+Constraints
+Description
+skill_id
+BIGINT
+Primary Key, Auto Increment
+Unique identifier for each skill.
+assignment_type_id
+BIGINT
+Foreign Key, NOT NULL
+References the Assignment Type to which the skill belongs.
+skill_name
+VARCHAR(100)
+NOT NULL
+Stores the name of the skill.
+created_by
+BIGINT
+Foreign Key, NOT NULL
+References the Assignment Manager who created the skill.
+updated_by
+BIGINT
+Foreign Key
+References the Assignment Manager who last updated the skill.
+created_at
+TIMESTAMP
+DEFAULT CURRENT_TIMESTAMP
+Stores the record creation timestamp.
+updated_at
+TIMESTAMP
+DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+Stores the last modification timestamp.
+is_deleted
+BOOLEAN
+DEFAULT FALSE
+Indicates whether the skill has been soft deleted.
+
+4. Explanation of Each Field
+skill_id
+Purpose
+Uniquely identifies each Skill.
+Why BIGINT?
+Supports a large number of records. 
+Compatible with Spring Data JPA (Long). 
+Standard primary key used throughout the application. 
+Why Primary Key?
+Every Skill must have a unique identifier.
+
+assignment_type_id
+Purpose
+Identifies the Assignment Type to which the Skill belongs.
+Example
+Software Project Assignment
+        â†“
+Java
+Spring Boot
+React
+Why BIGINT?
+Matches the Primary Key data type of the assignment_types table.
+Why Foreign Key?
+Ensures every Skill belongs to a valid Assignment Type and maintains referential integrity.
+
+skill_name
+Purpose
+Stores the name of the Skill.
+Examples:
+Java 
+Spring Boot 
+React 
+Machine Operation 
+Negotiation 
+Why VARCHAR(100)?
+Skill names are short textual values. VARCHAR(100) provides sufficient storage while remaining efficient.
+Why NOT NULL?
+Every Skill must have a valid name.
+
+created_by
+Purpose
+References the Assignment Manager who created the Skill.
+Why BIGINT?
+Matches the Primary Key of the users table.
+Why Foreign Key?
+Maintains audit information by identifying who created the record.
+
+updated_by
+Purpose
+References the Assignment Manager who last modified the Skill.
+Why BIGINT?
+Matches the Primary Key of the users table.
+Why Foreign Key?
+Maintains audit information by identifying who updated the record.
+
+created_at
+Purpose
+Stores the date and time when the Skill was created.
+Why TIMESTAMP?
+Ideal for audit fields and integrates seamlessly with Spring Data JPA.
+
+updated_at
+Purpose
+Stores the last modification timestamp.
+Why TIMESTAMP?
+Automatically updated whenever the record is modified.
+
+is_deleted
+Purpose
+Supports Soft Delete.
+Instead of permanently deleting a Skill, the system marks it as deleted.
+Why BOOLEAN?
+Only two states are required:
+FALSE â†’ Active 
+TRUE â†’ Deleted 
+Why Soft Delete?
+Resources, Tasks, and historical Assignments may still reference the Skill. Soft delete preserves referential integrity.
+
+5. Primary Key
+Column
+skill_id
+
+6. Foreign Keys
+Column
+References
+Relationship
+assignment_type_id
+assignment_types.assignment_type_id
+Many-to-One
+created_by
+users.user_id
+Many-to-One
+updated_by
+users.user_id
+Many-to-One
+
+7. Database Relationships
+Parent Table
+Child Table
+Relationship
+assignment_types
+skills
+One-to-Many
+skills
+resource_skills
+One-to-Many
+skills
+task_skills
+One-to-Many
+users
+skills (created_by)
+One-to-Many
+users
+skills (updated_by)
+One-to-Many
+
+Relationship Diagram
+users (1)
+   â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€< skills (created_by)
+   â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€< skills (updated_by)
+
+assignment_types (1)
+        â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€< skills (Many)
+
+skills (1)
+      â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€< resource_skills (Many)
+      â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€< task_skills (Many)
+
+8. Spring Data JPA Mapping
+Skill Entity
+@ManyToOne
+@JoinColumn(name = "assignment_type_id")
+private AssignmentType assignmentType;
+
+@ManyToOne
+@JoinColumn(name = "created_by")
+private User createdBy;
+
+@ManyToOne
+@JoinColumn(name = "updated_by")
+private User updatedBy;
+
+@OneToMany(mappedBy = "skill")
+private List<ResourceSkill> resourceSkills;
+
+@OneToMany(mappedBy = "skill")
+private List<TaskSkill> taskSkills;
+ResourceSkill Entity
+@ManyToOne
+@JoinColumn(name = "skill_id")
+private Skill skill;
+TaskSkill Entity
+@ManyToOne
+@JoinColumn(name = "skill_id")
+private Skill skill;
+Why @ManyToOne?
+A Skill belongs to one Assignment Type, while one Assignment Type can have multiple Skills.
+A Skill is also created and updated by one Assignment Manager.
+Why @OneToMany?
+One Skill can be assigned to many Resources and required by many Tasks.
+
+9. Used By Forms
+Form
+Purpose
+Skill Master
+Create, Update, View, and Delete Skills.
+Resource Management
+Select Skills for each Resource.
+Create Assignment â€“ Task Management
+Select Required Skills for Tasks.
+Preview Assignment
+
+
+Displays the selected Tasks and their required Skills before assignment generation.
+
+
+10. Business Rules
+Every Skill must belong to exactly one Assignment Type. 
+Assignment Type is mandatory before creating a Skill. 
+Skill Name is mandatory. 
+Skill Names must be unique within the same Assignment Type. 
+Soft-deleted Skills cannot be assigned to new Resources or Tasks. 
+Existing Resources and Tasks continue to reference a soft-deleted Skill. 
+Every create and update operation records the responsible Assignment Manager. 
+
+11. Dummy Data
+skill_id
+assignment_type_id
+skill_name
+created_by
+updated_by
+created_at
+updated_at
+is_deleted
+1
+1
+Java
+1
+1
+2026-07-20 09:00:00
+2026-07-20 09:00:00
+FALSE
+2
+1
+Spring Boot
+1
+1
+2026-07-20 09:10:00
+2026-07-20 09:10:00
+FALSE
+3
+1
+React
+1
+2
+2026-07-20 09:20:00
+2026-07-22 11:30:00
+FALSE
+4
+2
+Machine Operation
+2
+2
+2026-07-20 10:00:00
+2026-07-20 10:00:00
+FALSE
+5
+3
+Brick Work
+1
+1
+2026-07-20 10:30:00
+2026-07-20 10:30:00
+FALSE
+6
+4
+Negotiation
+2
+2
+2026-07-20 11:00:00
+2026-07-20 11:00:00
+FALSE
+
+12. Why This Design? (Architectural Reasoning)
+Why create a separate Skills table?
+Skills are reusable master data. A single Skill such as Java or Negotiation can be assigned to multiple Resources and required by multiple Tasks. Storing Skills separately eliminates duplication and ensures consistency.
+Why relate Skills to Assignment Types?
+Skills are domain-specific. For example:
+Java belongs to Software Project Assignment. 
+Brick Work belongs to Construction Project Assignment. 
+This ensures users can only select relevant Skills based on the chosen Assignment Type.
+Why doesn't this table include a Description field?
+The Skill Master UI only requires Assignment Type and Skill Name. Skill names are concise and self-explanatory, so an additional Description field would add unnecessary complexity.
+Why include created_by and updated_by?
+These fields provide complete auditability by recording who created and last modified each Skill.
+Why use Soft Delete?
+Soft delete preserves historical relationships with Resources and Tasks while preventing deleted Skills from being used in new records.
+Overall Design Justification
+The skills table centralizes reusable competencies, categorizes them by Assignment Type, and serves as the foundation for the Business Rule Engine and the Hungarian Algorithm. The design follows Third Normal Form (3NF) and is optimized for Spring Boot, Spring Data JPA, MySQL, JasperReports, and Apache POI. It provides a scalable and maintainable foundation for skill-based resource assignment.
+Table 5: Resources
+1. Module
+Master Data
+
+2. Purpose
+The resources table stores reusable resources that can participate in multiple assignments.
+A Resource represents an individual who can be assigned to one or more tasks during the assignment optimization process.
+Each Resource belongs to one Assignment Type and one Role. A Resource may possess multiple Skills, which are maintained separately in the resource_skills table.
+The Hungarian Algorithm uses the Resource's Monthly Salary for Cost Minimization and Performance Rating for Profit Maximization.
+Examples
+Software Project Assignment
+Aarav Sharma 
+Priya Verma 
+Rahul Sharma 
+Manufacturing Job Assignment
+Ravi Kumar 
+Amit Singh 
+Construction Project Assignment
+Suresh Patel 
+Mohan Yadav 
+
+3. Table Structure
+Column Name
+Data Type
+Constraints
+Description
+resource_id
+BIGINT
+Primary Key, Auto Increment
+Unique identifier for each resource.
+assignment_type_id
+BIGINT
+Foreign Key, NOT NULL
+References the Assignment Type to which the resource belongs.
+role_id
+BIGINT
+Foreign Key, NOT NULL
+References the Role assigned to the resource.
+resource_name
+VARCHAR(100)
+NOT NULL
+Stores the resource's full name.
+monthly_salary
+DECIMAL(12,2)
+NOT NULL
+Stores the monthly salary of the resource.
+performance_rating
+DECIMAL(5,2)
+NOT NULL
+Stores the performance rating of the resource.
+created_by
+BIGINT
+Foreign Key, NOT NULL
+References the Assignment Manager who created the resource.
+updated_by
+BIGINT
+Foreign Key
+References the Assignment Manager who last updated the resource.
+created_at
+TIMESTAMP
+DEFAULT CURRENT_TIMESTAMP
+Stores the record creation timestamp.
+updated_at
+TIMESTAMP
+DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+Stores the last modification timestamp.
+is_deleted
+BOOLEAN
+DEFAULT FALSE
+Indicates whether the resource has been soft deleted.
+
+4. Explanation of Each Field
+resource_id
+Purpose
+Uniquely identifies each Resource.
+Why BIGINT?
+Supports a large number of records. 
+Compatible with Spring Data JPA (Long). 
+Standard primary key throughout the application. 
+Why Primary Key?
+Every Resource must have a unique identifier.
+
+assignment_type_id
+Purpose
+Identifies the Assignment Type to which the Resource belongs.
+Example
+Software Project Assignment
+        â†“
+Aarav Sharma
+Why BIGINT?
+Matches the Primary Key of the assignment_types table.
+Why Foreign Key?
+Ensures that every Resource belongs to a valid Assignment Type.
+This relationship also enables filtering resources by Assignment Type.
+
+role_id
+Purpose
+Stores the Role assigned to the Resource.
+Example
+Backend Developer
+â†“
+Aarav Sharma
+Why BIGINT?
+Matches the Primary Key of the roles table.
+Why Foreign Key?
+Ensures every Resource has a valid Role.
+
+resource_name
+Purpose
+Stores the full name of the Resource.
+Examples
+Aarav Sharma 
+Priya Verma 
+Ravi Kumar 
+Why VARCHAR(100)?
+Resource names are textual values. VARCHAR(100) provides sufficient storage.
+Why NOT NULL?
+Every Resource must have a name.
+Why NOT UNIQUE?
+Multiple Resources may have the same name.
+Example
+Rahul Sharma
+Employee A
+
+Rahul Sharma
+Employee B
+The unique identifier is resource_id, not the name.
+
+monthly_salary
+Purpose
+Stores the monthly salary of the Resource.
+Example
+90000.00
+Why DECIMAL(12,2)?
+Salary is a monetary value.
+DECIMAL avoids floating-point precision errors.
+Why NOT NULL?
+Every Resource must have a salary because Cost Minimization depends on it.
+Why store Monthly Salary instead of Cost Per Day?
+Cost Per Day is a derived value.
+It is calculated as:
+Cost Per Day =
+Monthly Salary Ã· Working Days Per Month
+Since Working Days Per Month comes from the Assignment Constraints, Cost Per Day should not be stored in the database.
+
+performance_rating
+Purpose
+Stores the Resource's performance rating.
+Example
+91.50
+Why DECIMAL(5,2)?
+Allows values like:
+88.25
+91.50
+95.75
+Future-proof if fractional ratings are introduced.
+Why NOT NULL?
+Performance Rating is required for Profit Maximization.
+
+created_by
+Purpose
+References the Assignment Manager who created the Resource.
+Why Foreign Key?
+Maintains audit information.
+
+updated_by
+Purpose
+References the Assignment Manager who last modified the Resource.
+Why Foreign Key?
+Supports audit tracking.
+
+created_at
+Purpose
+Stores when the Resource was created.
+Why TIMESTAMP?
+Supports auditing and integrates with Spring Data JPA.
+
+updated_at
+Purpose
+Stores when the Resource was last modified.
+Why TIMESTAMP?
+Automatically updated when the record changes.
+
+is_deleted
+Purpose
+Supports Soft Delete.
+Why BOOLEAN?
+Only two states are required.
+FALSE â†’ Active 
+TRUE â†’ Deleted 
+Why Soft Delete?
+Historical Assignments may reference the Resource.
+Soft delete preserves referential integrity.
+
+5. Primary Key
+Column
+resource_id
+
+6. Foreign Keys
+Column
+References
+Relationship
+assignment_type_id
+assignment_types.assignment_type_id
+Many-to-One
+role_id
+roles.role_id
+Many-to-One
+created_by
+users.user_id
+Many-to-One
+updated_by
+users.user_id
+Many-to-One
+
+7. Database Relationships
+Parent Table
+Child Table
+Relationship
+assignment_types
+resources
+One-to-Many
+roles
+resources
+One-to-Many
+resources
+resource_skills
+One-to-Many
+users
+resources (created_by)
+One-to-Many
+users
+resources (updated_by)
+One-to-Many
+
+Relationship Diagram
+assignment_types (1)
+        â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€< resources (Many)
+
+roles (1)
+      â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€< resources (Many)
+
+
+users (1)
+      â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€< resources (created_by)
+      â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€< resources (updated_by)
+
+resources (1)
+      â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€< resource_skills (Many)
+
+8. Spring Data JPA Mapping
+Resource Entity
+@ManyToOne
+@JoinColumn(name = "assignment_type_id")
+private AssignmentType assignmentType;
+
+@ManyToOne
+@JoinColumn(name = "role_id")
+private Role role;
+
+@ManyToOne
+@JoinColumn(name = "created_by")
+private User createdBy;
+
+@ManyToOne
+@JoinColumn(name = "updated_by")
+private User updatedBy;
+
+@OneToMany(mappedBy = "resource")
+private List<ResourceSkill> resourceSkills;
+ResourceSkill Entity
+@ManyToOne
+@JoinColumn(name = "resource_id")
+private Resource resource;
+Why @ManyToOne?
+Each Resource belongs to one Assignment Type and one Role.
+
+Why @OneToMany?
+One Resource can possess multiple Skills.
+
+9. Used By Forms
+Form
+Purpose
+Resource Management
+Create, Update, View, Delete, and Bulk Upload Resources.
+Create Assignment â€“ Select Resources
+Load reusable Resources.
+Preview Assignment
+Display selected Resources.
+Assignment Results Screen
+Display assigned Resources.
+
+10. Business Rules
+Every Resource must belong to one Assignment Type. 
+Every Resource must have one Role. 
+Resource Name is mandatory. 
+Duplicate Resource Names are allowed. 
+Monthly Salary must be greater than zero. 
+Performance Rating must be greater than or equal to zero. 
+Soft-deleted Resources cannot participate in new Assignments. 
+Skills are not stored in this table; they are maintained separately in the resource_skills table. 
+Bulk Upload inserts records into both resources and resource_skills. 
+
+11. Dummy Data
+resource_id
+assignment_type_id
+role_id
+resource_name
+monthly_salary
+performance_rating
+created_by
+updated_by
+is_deleted
+1
+1
+2
+Aarav Sharma
+90000.00
+88.00
+1
+1
+FALSE
+2
+1
+3
+Priya Verma
+82000.00
+91.00
+1
+2
+FALSE
+3
+2
+4
+Ravi Kumar
+45000.00
+78.00
+2
+2
+FALSE
+4
+4
+6
+Neha Iyer
+72000.00
+84.00
+2
+2
+FALSE
+
+12. Why This Design? (Architectural Reasoning)
+Why create a separate Resources table?
+Resources are reusable across multiple assignments. Storing them once avoids duplication and allows Assignment Managers to select existing Resources rather than recreating them.
+
+Why are Skills stored separately?
+A Resource can have multiple Skills, and a Skill can belong to multiple Resources. This is a Many-to-Many relationship and is normalized using the resource_skills table.
+
+Why store Monthly Salary instead of Cost Per Day?
+Cost Per Day is calculated using the Resource's Monthly Salary and the Assignment's Working Days Per Month. Since it is a derived value, storing it would introduce redundancy and potential inconsistency.
+
+Why allow duplicate Resource Names?
+Names are not guaranteed to be unique in real organizations. The resource_id uniquely identifies each Resource.
+
+Why use Soft Delete?
+Resources may already be referenced by historical Assignments and Reports. Soft delete preserves those relationships while preventing deleted Resources from being used in future assignments.
+
+Overall Design Justification
+The resources table is the central entity of the Resource Management module. It provides reusable Resource information, supports cost and performance optimization, integrates seamlessly with the Business Rule Engine and Hungarian Algorithm, and is fully compatible with Spring Boot, Spring Data JPA, MySQL, JasperReports, and Apache POI. It follows Third Normal Form (3NF) and provides a scalable foundation for the Task Align optimization engine.
+
+
+Table 6: Resource Skills
+1. Module
+Master Data
+
+2. Purpose
+The resource_skills table stores the relationship between Resources and Skills.
+It is a junction table that resolves the Many-to-Many relationship between the resources and skills tables.
+A Resource can possess multiple Skills, and the same Skill can be assigned to multiple Resources.
+This table is used by the Business Rule Engine to determine whether a Resource is eligible to perform a Task by comparing Resource Skills with Task Required Skills.
+Example
+Resource
+Aarav Sharma
+Skills
+Java 
+Spring Boot 
+REST API 
+Database
+Resource
+Skill
+Aarav Sharma
+Java
+Aarav Sharma
+Spring Boot
+Aarav Sharma
+REST API
+
+3. Table Structure
+Column Name
+Data Type
+Constraints
+Description
+resource_skill_id
+BIGINT
+Primary Key, Auto Increment
+Unique identifier for each Resource-Skill mapping.
+resource_id
+BIGINT
+Foreign Key, NOT NULL
+References the Resource.
+skill_id
+BIGINT
+Foreign Key, NOT NULL
+References the Skill assigned to the Resource.
+Additional Constraint
+UNIQUE(resource_id, skill_id)
+This prevents the same Skill from being assigned multiple times to the same Resource.
+
+4. Explanation of Each Field
+resource_skill_id
+Purpose
+Uniquely identifies each Resource-Skill mapping.
+Why BIGINT?
+Supports large datasets. 
+Compatible with Spring Data JPA (Long). 
+Why Primary Key?
+Provides a simple surrogate key, making JPA entities and CRUD operations easier than using composite primary keys.
+
+resource_id
+Purpose
+References the Resource that owns the Skill.
+Example
+Aarav Sharma
+        â†“
+Java
+Why BIGINT?
+Matches the Primary Key of the resources table.
+Why Foreign Key?
+Ensures every mapping belongs to a valid Resource.
+
+skill_id
+Purpose
+References the Skill assigned to the Resource.
+Example
+Aarav Sharma
+        â†“
+Spring Boot
+Why BIGINT?
+Matches the Primary Key of the skills table.
+Why Foreign Key?
+Ensures every mapping references a valid Skill.
+
+5. Primary Key
+Column
+resource_skill_id
+
+6. Foreign Keys
+Column
+References
+Relationship
+resource_id
+resources.resource_id
+Many-to-One
+skill_id
+skills.skill_id
+Many-to-One
+
+7. Database Relationships
+Parent Table
+Child Table
+Relationship
+resources
+resource_skills
+One-to-Many
+skills
+resource_skills
+One-to-Many
+
+Relationship Diagram
+resources (1)
+      â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€< resource_skills (Many)
+                     â”‚
+                     â–¼
+                  skills (1)
+or conceptually:
+Resources
+     â†•
+Many-to-Many
+     â†•
+Skills
+
+Resolved By
+
+resource_skills
+
+8. Spring Data JPA Mapping
+ResourceSkill Entity
+@ManyToOne
+@JoinColumn(name = "resource_id")
+private Resource resource;
+
+@ManyToOne
+@JoinColumn(name = "skill_id")
+private Skill skill;
+Resource Entity
+@OneToMany(mappedBy = "resource")
+private List<ResourceSkill> resourceSkills;
+Skill Entity
+@OneToMany(mappedBy = "skill")
+private List<ResourceSkill> resourceSkills;
+Why @ManyToOne?
+Each Resource-Skill mapping belongs to one Resource and one Skill.
+Why @OneToMany?
+One Resource can have multiple Skills, and one Skill can belong to multiple Resources through this mapping table.
+
+9. Used By Forms
+Form
+Purpose
+Resource Management
+Stores the selected Skills for each Resource.
+Create Assignment â€“ Select Resources
+Displays the Skills associated with each Resource.
+Preview Assignment
+Business Rule Engine compares Resource Skills with Task Required Skills.
+
+10. Business Rules
+Every Resource-Skill mapping must reference a valid Resource. 
+Every Resource-Skill mapping must reference a valid Skill. 
+A Resource can have multiple Skills. 
+A Skill can belong to multiple Resources. 
+The combination of resource_id and skill_id must be unique. 
+Skills are selected manually by the Assignment Manager based on the Resource's actual competencies. 
+Skills are loaded based on the selected Assignment Type, not the selected Role. 
+The Business Rule Engine compares Resource Skills with Task Required Skills to determine eligibility. 
+
+11. Dummy Data
+resource_skill_id
+resource_id
+skill_id
+1
+1
+1 (Java)
+2
+1
+2 (Spring Boot)
+3
+1
+5 (REST API)
+4
+2
+3 (React)
+5
+2
+5 (REST API)
+6
+3
+6 (Machine Operation)
+7
+4
+9 (Negotiation)
+8
+4
+10 (Product Knowledge)
+
+12. Why This Design? (Architectural Reasoning)
+Why create a separate resource_skills table?
+A Resource can possess multiple Skills, and the same Skill can belong to multiple Resources. This is a Many-to-Many relationship, which is resolved using a junction table to maintain normalization.
+
+Why not store Skills directly in the resources table?
+Storing multiple Skills in a single column (e.g., "Java, Spring Boot, REST API") violates the First Normal Form (1NF), makes searching difficult, and prevents efficient joins and comparisons. Separating Skills into a mapping table keeps the database normalized and scalable.
+
+Why use a surrogate primary key instead of a composite key?
+Using resource_skill_id simplifies Spring Data JPA entity mapping, repository operations, and future enhancements. A composite primary key would require @EmbeddedId or @IdClass, increasing implementation complexity.
+
+Why add a UNIQUE constraint on (resource_id, skill_id)?
+This prevents assigning the same Skill to the same Resource more than once while still allowing a Resource to have multiple different Skills.
+
+Why aren't Skills filtered by Role?
+Roles represent a Resource's designation, while Skills represent the Resource's actual competencies. Resources with the same Role can possess different Skills. Therefore, Skills are loaded based on the selected Assignment Type, and the Assignment Manager selects the actual Skills possessed by the Resource.
+
+Overall Design Justification
+The resource_skills table is a lightweight junction table that resolves the Many-to-Many relationship between Resources and Skills. It supports the Business Rule Engine, enables accurate skill matching during assignment generation, and maintains a normalized database structure. The design is fully compatible with Spring Boot, Spring Data JPA, MySQL, JasperReports, and Apache POI, while remaining flexible for future enhancements such as skill proficiency levels or years of experience.
+
+Bottom of Form
+
+Business Rule: Resource Skills Selection
+When an Assignment Manager selects an Assignment Type, the system loads:
+Roles belonging to the selected Assignment Type. 
+Skills belonging to the selected Assignment Type. 
+After selecting a Role, the Skills list is not filtered by the selected Role. Instead, it continues to display all Skills available for the selected Assignment Type.
+The Assignment Manager is responsible for selecting the actual skills possessed by the Resource.
+
+Why?
+A Role represents the designation or job title of a Resource, whereas Skills represent the Resource's individual competencies.
+Multiple Resources with the same Role may possess different skill sets depending on their experience, certifications, and expertise.
+Example
+Assignment Type
+Software Project Assignment
+Role
+Backend Developer
+Resource 1 â€“ Aarav Sharma
+Java 
+Spring Boot 
+REST API 
+Resource 2 â€“ Rahul Verma
+Java 
+Spring Boot 
+Docker 
+AWS 
+Resource 3 â€“ Priya Verma
+Java 
+React 
+MySQL 
+Although all three Resources have the same Role (Backend Developer), they possess different Skills.
+Restricting the Skills list based on the selected Role would incorrectly assume that every Resource with the same Role has identical skills.
+
+Business Rule Engine Dependency
+During assignment generation, the Business Rule Engine compares:
+Task Required Skills
+        â†“
+Resource Skills
+It does not compare:
+Task Required Skills
+        â†“
+Role
+Therefore, the system stores Skills independently of Roles and allows the Assignment Manager to assign the actual skills possessed by each Resource.
+
+Database Justification
+The database follows this relationship:
+Assignment Type
+        â”‚
+        â”œâ”€â”€ Roles
+        â”‚
+        â””â”€â”€ Skills
+               â”‚
+               â–¼
+        Resource Skills
+There is no direct relationship between Roles and Skills.
+This design:
+Eliminates unnecessary restrictions. 
+Supports Resources with diverse skill sets. 
+Keeps the database normalized (Third Normal Form). 
+Enables accurate skill matching by the Business Rule Engine. 
+Supports future expansion without redesigning the database. 
+
+
+Table 7: Assignments
+1. Module
+Assignment Management
+
+2. Purpose
+The assignments table stores the primary information of each assignment created in the Task Align system.
+An Assignment acts as the parent entity for Assignment Resources, Tasks, and Assignment Constraints.
+When an Assignment Manager creates a new assignment, the system stores its basic information, selected optimization type, current status, and audit details in this table.
+Examples
+Software Project Assignment
+E-Commerce Website Development 
+Construction Project Assignment
+Residential Building Construction 
+Manufacturing Job Assignment
+Mobile Phone Assembly Line 
+
+3. Table Structure
+Column Name
+Data Type
+Constraints
+Description
+assignment_id
+BIGINT
+Primary Key, Auto Increment
+Unique identifier for each assignment.
+assignment_type_id
+BIGINT
+Foreign Key, NOT NULL
+References the selected Assignment Type.
+assignment_name
+VARCHAR(150)
+NOT NULL
+Stores the name of the assignment.
+assignment_description
+TEXT
+NULL
+Stores the assignment description.
+optimization_type
+ENUM('COST_MINIMIZATION',
+'PROFIT_MAXIMIZATION')
+NOT NULL
+Stores the selected optimization objective.
+assignment_status
+ENUM('DRAFT','COMPLETED')
+DEFAULT 'DRAFT'
+Stores the current assignment status.
+created_by
+BIGINT
+Foreign Key, NOT NULL
+References the Assignment Manager who created the assignment.
+updated_by
+BIGINT
+Foreign Key
+References the Assignment Manager who last modified the assignment.
+created_at
+TIMESTAMP
+DEFAULT CURRENT_TIMESTAMP
+Stores the record creation timestamp.
+updated_at
+TIMESTAMP
+DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+Stores the last modification timestamp.
+is_deleted
+BOOLEAN
+DEFAULT FALSE
+Indicates whether the assignment has been soft deleted.
+
+4. Explanation of Each Field
+assignment_id
+Purpose
+Uniquely identifies each Assignment.
+Why BIGINT?
+Supports a large number of assignment records. 
+Compatible with Spring Data JPA (Long). 
+Maintains consistency with other primary keys. 
+Why Primary Key?
+Every Assignment must have a unique identifier.
+
+assignment_type_id
+Purpose
+Identifies the Assignment Type selected for the Assignment.
+Example
+Software Project Assignment
+â†“
+E-Commerce Website Development
+Why BIGINT?
+Matches the Primary Key of the assignment_types table.
+Why Foreign Key?
+Ensures every Assignment belongs to a valid Assignment Type.
+
+assignment_name
+Purpose
+Stores the name of the Assignment.
+Examples
+E-Commerce Website Development 
+Smart Factory Automation 
+Hospital Staff Allocation 
+Why VARCHAR(150)?
+Provides sufficient space for meaningful assignment names.
+Why NOT NULL?
+Every Assignment must have a name.
+
+assignment_description
+Purpose
+Stores additional information describing the Assignment.
+Example
+Develop an online shopping platform with user authentication, payment integration, and inventory management.
+Why TEXT?
+Descriptions may vary significantly in length.
+Why NULL?
+Providing a description is optional.
+
+optimization_type
+Purpose
+Stores the optimization objective selected by the Assignment Manager.
+Possible values
+COST_MINIMIZATION 
+PROFIT_MAXIMIZATION 
+Why ENUM?
+Only predefined optimization objectives are allowed.
+Why NOT NULL?
+Every Assignment must specify an optimization objective before execution.
+
+assignment_status
+Purpose
+Stores the current lifecycle status of the Assignment.
+Possible values
+DRAFT 
+COMPLETED 
+Why ENUM?
+Restricts values to valid business states.
+Why DEFAULT 'DRAFT'?
+Every newly created Assignment starts with the status DRAFT. After the Hungarian Algorithm successfully generates the assignment, its status changes to COMPLETED.
+
+created_by
+Purpose
+Stores the Assignment Manager who created the Assignment.
+Why Foreign Key?
+Maintains audit information and ownership.
+
+updated_by
+Purpose
+Stores the Assignment Manager who last modified the Assignment.
+Why Foreign Key?
+Supports audit tracking.
+
+created_at
+Purpose
+Stores the date and time when the Assignment was created.
+Why TIMESTAMP?
+Supports auditing and integrates with Spring Data JPA.
+
+updated_at
+Purpose
+Stores the last modification timestamp.
+Why TIMESTAMP?
+Automatically updates whenever the Assignment is modified.
+
+is_deleted
+Purpose
+Supports Soft Delete.
+Why BOOLEAN?
+Only two states are required.
+FALSE â†’ Active 
+TRUE â†’ Deleted 
+Why Soft Delete?
+Assignments may already be referenced by reports and historical data. Soft delete preserves these relationships.
+
+5. Primary Key
+Column
+assignment_id
+
+6. Foreign Keys
+Column
+References
+Relationship
+assignment_type_id
+assignment_types.assignment_type_id
+Many-to-One
+created_by
+users.user_id
+Many-to-One
+updated_by
+users.user_id
+Many-to-One
+
+7. Database Relationships
+Parent Table
+Child Table
+Relationship
+assignment_types
+assignments
+One-to-Many
+users
+assignments (created_by)
+One-to-Many
+users
+assignments (updated_by)
+One-to-Many
+assignments
+assignment_resources
+One-to-Many
+assignments
+tasks
+One-to-Many
+assignments
+assignment_constraints
+One-to-One
+
+Relationship Diagram
+assignment_types (1)
+        â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€< assignments (Many)
+
+users (1)
+      â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€< assignments (created_by)
+      â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€< assignments (updated_by)
+
+assignments (1)
+      â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€< assignment_resources (Many)
+      â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€< tasks (Many)
+      â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ assignment_constraints (1)
+
+8. Spring Data JPA Mapping
+Assignment Entity
+@ManyToOne
+@JoinColumn(name = "assignment_type_id")
+private AssignmentType assignmentType;
+
+@ManyToOne
+@JoinColumn(name = "created_by")
+private User createdBy;
+
+@ManyToOne
+@JoinColumn(name = "updated_by")
+private User updatedBy;
+
+@OneToMany(mappedBy = "assignment")
+private List<AssignmentResource> assignmentResources;
+
+@OneToMany(mappedBy = "assignment")
+private List<Task> tasks;
+
+@OneToOne(mappedBy = "assignment")
+private AssignmentConstraint assignmentConstraint;
+
+Why @ManyToOne?
+Each Assignment belongs to one Assignment Type and is created/updated by one User.
+Why @OneToMany?
+An Assignment can contain multiple Resources and multiple Tasks.
+Why @OneToOne?
+Each Assignment has one set of Constraints and one final Result.
+
+9. Used By Forms
+Form
+Purpose
+Create Assignment
+Stores Assignment Details.
+Preview Assignment
+Displays Assignment information before generation.
+Assignment Results Screen
+Displays finalized Assignment details.
+Dashboard
+Displays Assignment statistics and status.
+
+10. Business Rules
+Every Assignment must belong to one Assignment Type. 
+Assignment Name is mandatory.
+Every Assignment must have one Optimization Type. 
+Every newly created Assignment starts with the status DRAFT. 
+After successful generation and saving, the status changes to COMPLETED. 
+Soft-deleted Assignments cannot be edited or selected for new operations. 
+An Assignment cannot be generated unless Resources, Tasks, and Constraints are completed. 
+
+11. Dummy Data
+assignment_id
+assignment_type_id
+assignment_name
+optimization_type
+assignment_status
+created_by
+updated_by
+is_deleted
+1
+1
+E-Commerce Website Development
+COST_MINIMIZATION
+COMPLETED
+1
+1
+FALSE
+2
+2
+Mobile Assembly Line
+PROFIT_MAXIMIZATION
+DRAFT
+2
+2
+FALSE
+3
+3
+Residential Building Project
+COST_MINIMIZATION
+COMPLETED
+1
+2
+FALSE
+
+12. Why This Design? (Architectural Reasoning)
+Why create a separate Assignments table?
+The assignments table acts as the parent transaction entity for the entire assignment process. It stores only the core details of an Assignment while related information such as Resources, Tasks, Constraints are  maintained in dedicated tables.
+
+Why store Optimization Type here?
+The Optimization Type defines how the Assignment should be processed (Cost Minimization or Profit Maximization). It is an overall characteristic of the Assignment, not a constraint or result.
+
+Why keep Constraints in a separate table?
+Budget, Timeline, and Working Days are business constraints that may evolve independently of the Assignment's basic information. Storing them separately maintains normalization and improves maintainability.
+
+Why use DRAFT and COMPLETED?
+These statuses accurately reflect the current business workflow. An Assignment remains DRAFT while being prepared. After successful generation and saving, it becomes COMPLETED.
+
+Overall Design Justification
+The assignments table serves as the central transactional entity of the Task Align system. It maintains the core information required to identify and manage an Assignment while delegating Resources, Tasks, Constraints, and Results to specialized tables. This design follows Third Normal Form (3NF), supports Spring Boot, Spring Data JPA, MySQL, and integrates seamlessly with the Business Rule Engine and Hungarian Algorithm.
+
+Why optimization_type is stored here
+Even though the user selects Optimization Type later in the workflow (after entering constraints), it is still an attribute of the assignment itself, not of the constraints.
+For example:
+Assignment:
+Website Development
+
+Optimization Type:
+Cost Minimization
+or
+Assignment:
+Website Development
+
+Optimization Type:
+Profit Maximization
+It defines how the assignment should be optimized, so it belongs in the assignments table.
+
+Why Budget, Timeline and Working Days are NOT here
+Those are constraints applied to the assignment, so they belong in the separate assignment_constraints table.
+Assignment
+        â”œâ”€â”€ Assignment Details
+        â”œâ”€â”€ Optimization Type
+        â””â”€â”€ Assignment Constraints
+                â”œâ”€â”€ Budget
+                â”œâ”€â”€ Timeline
+                â””â”€â”€ Working Days
+This keeps the database normalized.
+
+Why isn't Assignment Name unique?
+Assignment Names are descriptive labels and are not used to uniquely identify an assignment. Different assignments may legitimately have the same name, especially when similar projects are executed at different times or for different clients. The system uniquely identifies every assignment using assignment_id, ensuring that duplicate names do not affect data integrity, reporting, or application functionality.
+
+
+Table 8: Assignment Resources
+1. Module
+Assignment Management
+
+2. Purpose
+The assignment_resources table stores the Resources selected for a specific Assignment.
+It is a junction table that resolves the Many-to-Many relationship between the assignments and resources tables.
+An Assignment can include multiple Resources, and a Resource can participate in multiple Assignments.
+This table is used during the Assignment Creation process to maintain the list of Resources selected by the Assignment Manager. It provides the input Resources for the Business Rule Engine and Hungarian Algorithm.
+Example
+Assignment
+E-Commerce Website Development
+Selected Resources
+Aarav Sharma 
+Priya Verma 
+Rahul Verma 
+Database
+Assignment
+Resource
+E-Commerce Website Development
+Aarav Sharma
+E-Commerce Website Development
+Priya Verma
+E-Commerce Website Development
+Rahul Verma
+
+3. Table Structure
+Column Name
+Data Type
+Constraints
+Description
+assignment_resource_id
+BIGINT
+Primary Key, Auto Increment
+Unique identifier for each Assignment-Resource mapping.
+assignment_id
+BIGINT
+Foreign Key, NOT NULL
+References the Assignment.
+resource_id
+BIGINT
+Foreign Key, NOT NULL
+References the selected Resource.
+Additional Constraint
+UNIQUE (assignment_id, resource_id)
+This ensures that the same Resource cannot be selected multiple times for the same Assignment.
+
+4. Explanation of Each Field
+assignment_resource_id
+Purpose
+Uniquely identifies each Assignment-Resource mapping.
+Why BIGINT?
+Supports a large number of mappings. 
+Compatible with Spring Data JPA (Long). 
+Maintains consistency with other primary keys. 
+Why Primary Key?
+Provides a simple surrogate key for CRUD operations and JPA entity mapping.
+
+assignment_id
+Purpose
+References the Assignment in which the Resource is selected.
+Example
+Website Development
+        â†“
+Aarav Sharma
+Why BIGINT?
+Matches the Primary Key of the assignments table.
+Why Foreign Key?
+Ensures every selected Resource belongs to a valid Assignment.
+
+resource_id
+Purpose
+References the selected Resource.
+Example
+Website Development
+        â†“
+Backend Developer
+        â†“
+Aarav Sharma
+Why BIGINT?
+Matches the Primary Key of the resources table.
+Why Foreign Key?
+Ensures only valid Resources can be assigned.
+
+5. Primary Key
+Column
+assignment_resource_id
+
+6. Foreign Keys
+Column
+References
+Relationship
+assignment_id
+assignments.assignment_id
+Many-to-One
+resource_id
+resources.resource_id
+Many-to-One
+
+7. Database Relationships
+Parent Table
+Child Table
+Relationship
+assignments
+assignment_resources
+One-to-Many
+resources
+assignment_resources
+One-to-Many
+
+Relationship Diagram
+assignments (1)
+      â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€< assignment_resources (Many)
+                     â”‚
+                    â–¼
+                 resources (1)
+Conceptually:
+Assignments
+      â†•
+Many-to-Many
+      â†•
+Resources
+
+Resolved By
+
+assignment_resources
+
+8. Spring Data JPA Mapping
+AssignmentResource Entity
+@ManyToOne
+@JoinColumn(name = "assignment_id")
+private Assignment assignment;
+
+@ManyToOne
+@JoinColumn(name = "resource_id")
+private Resource resource;
+Assignment Entity
+@OneToMany(mappedBy = "assignment")
+private List<AssignmentResource> assignmentResources;
+Resource Entity
+@OneToMany(mappedBy = "resource")
+private List<AssignmentResource> assignmentResources;
+Why @ManyToOne?
+Each Assignment-Resource mapping belongs to one Assignment and one Resource.
+Why @OneToMany?
+One Assignment can contain multiple Resources, and one Resource can participate in multiple Assignments through this mapping table.
+
+9. Used By Forms
+Form
+Purpose
+Create Assignment â€“ Select Resources
+Stores the selected Resources for an Assignment.
+Preview Assignment
+Displays the selected Resources before generation.
+Assignment Results Screen
+Retrieves the Resources participating in the Assignment.
+
+10. Business Rules
+Every Assignment-Resource mapping must reference a valid Assignment. 
+Every Assignment-Resource mapping must reference a valid Resource. 
+An Assignment can include multiple Resources. 
+A Resource can participate in multiple Assignments. 
+The combination of assignment_id and resource_id must be unique. 
+Removing a Resource from an Assignment removes only the mapping from assignment_resources; the Resource remains in the resources table. 
+Resources selected during Assignment Creation become the input for the Business Rule Engine and Hungarian Algorithm. 
+If a new Resource is added during Assignment Creation, it is first saved in the resources and resource_skills tables before being mapped in assignment_resources. 
+
+11. Dummy Data
+assignment_resource_id
+assignment_id
+resource_id
+1
+1
+1 (Aarav Sharma)
+2
+1
+2 (Priya Verma)
+3
+1
+3 (Rahul Verma)
+4
+2
+2 (Priya Verma)
+5
+2
+4 (Neha Iyer)
+
+12. Why This Design? (Architectural Reasoning)
+Why create a separate assignment_resources table?
+An Assignment can include multiple Resources, and a Resource can participate in multiple Assignments. This is a Many-to-Many relationship that is resolved using a junction table to maintain normalization.
+
+Why not store selected Resources directly in the assignments table?
+Storing multiple Resource IDs in a single column would violate the First Normal Form (1NF) and make searching, filtering, and joining difficult. A separate mapping table keeps the design normalized and scalable.
+
+Why use a surrogate primary key instead of a composite key?
+Using assignment_resource_id simplifies Spring Data JPA entity mapping, repository operations, and future enhancements. Composite primary keys would require @EmbeddedId or @IdClass, increasing implementation complexity.
+
+Why add a UNIQUE constraint on (assignment_id, resource_id)?
+This prevents the same Resource from being selected multiple times for the same Assignment while still allowing the Resource to participate in different Assignments.
+
+Why doesn't this table store Salary, Role, or Performance Rating?
+Salary, Role, and Performance Rating are already maintained in the resources table. Storing them again would introduce redundancy and violate database normalization. Whenever these values are required, the application retrieves them through the resource_id relationship.
+
+Why does removing a Resource from an Assignment not delete it from Resource Management?
+The resources table is the master repository of all Resources. Removing a Resource from an Assignment only removes the association in the assignment_resources table, allowing the same Resource to be reused in future Assignments.
+
+Overall Design Justification
+The assignment_resources table provides a normalized and reusable mechanism for associating Resources with Assignments. It supports resource selection during Assignment Creation, serves as the input to the Business Rule Engine and Hungarian Algorithm, and enables efficient resource reuse across multiple Assignments. The design follows Third Normal Form (3NF) and is fully compatible with Spring Boot, Spring Data JPA, MySQL, JasperReports, and Apache POI.
+
+
+Table 9: Tasks
+1. Module
+Assignment Management
+
+2. Purpose
+The tasks table stores the tasks created for a specific Assignment.
+Each Task represents an individual unit of work that must be completed as part of an Assignment. Every Task belongs to one Assignment and includes the estimated effort required for completion.
+The required Skills for each Task are maintained separately in the task_skills table. During assignment generation, the Business Rule Engine compares the Task's required Skills with the selected Resources' Skills to identify eligible Resources. The Hungarian Algorithm then determines the optimal Resource allocation.
+Examples
+Assignment
+E-Commerce Website Development
+Tasks
+Develop Login Module 
+Develop Dashboard 
+Payment Integration 
+Testing 
+
+3. Table Structure
+Column Name
+Data Type
+Constraints
+Description
+task_id
+BIGINT
+Primary Key, Auto Increment
+Unique identifier for each task.
+assignment_id
+BIGINT
+Foreign Key, NOT NULL
+References the Assignment to which the task belongs.
+task_name
+VARCHAR(150)
+NOT NULL
+Stores the name of the task.
+estimated_days
+INT
+NOT NULL
+Stores the estimated number of days required to complete the task.
+created_at
+TIMESTAMP
+DEFAULT CURRENT_TIMESTAMP
+Stores the record creation timestamp.
+updated_at
+TIMESTAMP
+DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+Stores the last modification timestamp.
+
+4. Explanation of Each Field
+task_id
+Purpose
+Uniquely identifies each Task.
+Why BIGINT?
+Supports a large number of task records. 
+Compatible with Spring Data JPA (Long). 
+Maintains consistency with other primary keys. 
+Why Primary Key?
+Every Task must have a unique identifier.
+
+assignment_id
+Purpose
+References the Assignment to which the Task belongs.
+Example
+Website Development
+        â†“
+Develop Login Module
+Why BIGINT?
+Matches the Primary Key of the assignments table.
+Why Foreign Key?
+Ensures every Task belongs to a valid Assignment.
+
+task_name
+Purpose
+Stores the name of the Task.
+Examples
+Develop Login Module 
+Develop Dashboard 
+Payment Integration 
+Testing 
+Why VARCHAR(150)?
+Provides sufficient space for meaningful task names.
+Why NOT NULL?
+Every Task must have a name.
+
+estimated_days
+Purpose
+Stores the estimated number of working days required to complete the Task.
+Example
+Develop Login Module
+
+Estimated Days = 5
+Why INT?
+Estimated Days is a whole number representing project effort.
+Why NOT NULL?
+Every Task must have an estimated duration because it is required during assignment generation and timeline validation.
+
+created_at
+Purpose
+Stores the date and time when the Task was created.
+Why TIMESTAMP?
+Supports auditing and integrates with Spring Data JPA.
+
+updated_at
+Purpose
+Stores the last modification timestamp.
+Why TIMESTAMP?
+Automatically updates whenever the Task is modified.
+
+5. Primary Key
+Column
+task_id
+
+6. Foreign Keys
+Column
+References
+Relationship
+assignment_id
+assignments.assignment_id
+Many-to-One
+
+7. Database Relationships
+Parent Table
+Child Table
+Relationship
+assignments
+tasks
+One-to-Many
+tasks
+task_skills
+One-to-Many
+
+Relationship Diagram
+assignments (1)
+      â”‚
+      â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€< tasks (Many)
+                     â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€< task_skills (Many)
+
+Task Entity
+
+@ManyToOne
+@JoinColumn(name = "assignment_id")
+private Assignment assignment;
+
+@OneToMany(mappedBy = "task")
+private List<TaskSkill> taskSkills;
+
+Assignment Entity
+
+@OneToMany(mappedBy = "assignment")
+private List<Task> tasks;
+
+TaskSkill Entity
+
+@ManyToOne
+@JoinColumn(name = "task_id")
+private Task task;
+
+Why @ManyToOne?
+Each Task belongs to exactly one Assignment.
+
+Why @OneToMany?
+One Task may require multiple Skills.
+9. Used By Forms
+Form
+Purpose
+Create Assignment â€“ Task Management
+Create, Update, and Delete Tasks.
+Preview Assignment
+Displays all Tasks before assignment generation.
+Assignment Results Screen
+Displays the final Resource allocated to each Task.
+
+10. Business Rules
+Every Task must belong to one Assignment. 
+Every Task must have a name. 
+Estimated Days is mandatory and must be greater than zero. 
+Required Skills are maintained separately in the task_skills table. 
+Tasks can be added, updated, or removed only while the Assignment is in DRAFT status. 
+Once an Assignment is COMPLETED, Tasks become read-only. 
+A Task cannot participate in assignment generation unless at least one required Skill is assigned. 
+The Business Rule Engine compares the Task's required Skills with the selected Resources' Skills before the Hungarian Algorithm is executed. 
+
+11. Dummy Data
+task_id
+assignment_id
+task_name
+estimated_days
+created_at
+updated_at
+1
+1
+Develop Login Module
+5
+2026-07-20 09:00:00
+2026-07-20 09:00:00
+2
+1
+Develop Dashboard
+4
+2026-07-20 09:10:00
+2026-07-20 09:10:00
+3
+1
+Payment Integration
+6
+2026-07-20 09:20:00
+2026-07-20 09:20:00
+4
+1
+Testing
+3
+2026-07-20 09:30:00
+2026-07-20 09:30:00
+
+12. Why This Design? (Architectural Reasoning)
+Why create a separate Tasks table?
+Tasks are transactional data created for each Assignment. Separating Tasks from the Assignment header keeps the database normalized and allows an Assignment to contain multiple independent units of work.
+
+Why are Required Skills stored separately?
+A Task can require multiple Skills, and a Skill can be required by multiple Tasks. This is a Many-to-Many relationship that is resolved using the task_skills table.
+
+Why doesn't this table store the assigned Resource?
+When a Task is created, no Resource has been allocated yet. Resource allocation is performed later by the Business Rule Engine and Hungarian Algorithm. Therefore, The assigned Resource is determined during assignment generation by the Business Rule Engine and Hungarian Algorithm. The generated allocation is displayed on the Assignment Results screen and can be exported as PDF or Excel without being stored in the database.
+Why isn't Estimated Cost stored?
+Estimated Cost is a derived value calculated using the assigned Resource's salary and the Task's estimated duration. Storing it would introduce redundancy and potential inconsistencies.
+
+Why don't Tasks have a Status?
+The Task Align system is designed for resource assignment optimization, not task execution tracking. The application does not monitor task progress (such as Not Started, In Progress, or Completed). Therefore, a task_status column is unnecessary in the current scope.
+
+Overall Design Justification
+The tasks table stores the work items that belong to an Assignment while maintaining a normalized relationship with the task_skills table. It serves as a key input to the Business Rule Engine and Hungarian Algorithm, enabling skill-based Resource allocation without duplicating data. The design follows Third Normal Form (3NF) and is fully compatible with Spring Boot, Spring Data JPA, MySQL, JasperReports, and Apache POI, providing a scalable and maintainable foundation for the Task Management component of Task Align.
+
+Table 10: Task Skills
+1. Module
+Assignment Management
+
+2. Purpose
+The task_skills table stores the required Skills for each Task.
+It is a junction table that resolves the Many-to-Many relationship between the tasks and skills tables.
+A Task can require multiple Skills, and the same Skill can be required by multiple Tasks.
+This table is a key input to the Business Rule Engine, which compares the Task's required Skills with the selected Resources' Skills to determine eligible Resources before executing the Hungarian Algorithm.
+Example
+Task
+Develop Login Module
+Required Skills
+Java 
+Spring Boot 
+MySQL 
+Database
+Task
+Skill
+Develop Login Module
+Java
+Develop Login Module
+Spring Boot
+Develop Login Module
+MySQL
+
+3. Table Structure
+Column Name
+Data Type
+Constraints
+Description
+task_skill_id
+BIGINT
+Primary Key, Auto Increment
+Unique identifier for each Task-Skill mapping.
+task_id
+BIGINT
+Foreign Key, NOT NULL
+References the Task.
+skill_id
+BIGINT
+Foreign Key, NOT NULL
+References the required Skill for the Task.
+Additional Constraint
+UNIQUE(task_id, skill_id)
+This prevents assigning the same Skill multiple times to the same Task.
+
+4. Explanation of Each Field
+task_skill_id
+Purpose
+Uniquely identifies each Task-Skill mapping.
+Why BIGINT?
+Supports a large number of mappings. 
+Compatible with Spring Data JPA (Long). 
+Maintains consistency with other primary keys. 
+Why Primary Key?
+Provides a simple surrogate key that simplifies CRUD operations and Spring Data JPA entity mapping compared to composite primary keys.
+
+task_id
+Purpose
+References the Task that requires the Skill.
+Example
+Develop Login Module
+        â†“
+Java
+Why BIGINT?
+Matches the Primary Key of the tasks table.
+Why Foreign Key?
+Ensures every mapping belongs to a valid Task.
+
+skill_id
+Purpose
+References the Skill required for the Task.
+Example
+Develop Login Module
+        â†“
+Spring Boot
+Why BIGINT?
+Matches the Primary Key of the skills table.
+Why Foreign Key?
+Ensures every mapping references a valid Skill.
+
+5. Primary Key
+Column
+task_skill_id
+
+6. Foreign Keys
+Column
+References
+Relationship
+task_id
+tasks.task_id
+Many-to-One
+skill_id
+skills.skill_id
+Many-to-One
+
+7. Database Relationships
+Parent Table
+Child Table
+Relationship
+tasks
+task_skills
+One-to-Many
+skills
+task_skills
+One-to-Many
+
+Relationship Diagram
+tasks (1)
+      â”‚
+      â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€< task_skills (Many)
+                     â”‚
+                     â–¼
+                  skills (1)
+Conceptually
+Tasks
+     â†•
+Many-to-Many
+     â†•
+Skills
+
+Resolved By
+
+task_skills
+
+8. Spring Data JPA Mapping
+TaskSkill Entity
+@ManyToOne
+@JoinColumn(name = "task_id")
+private Task task;
+
+@ManyToOne
+@JoinColumn(name = "skill_id")
+private Skill skill;
+Task Entity
+@OneToMany(mappedBy = "task")
+private List<TaskSkill> taskSkills;
+Skill Entity
+@OneToMany(mappedBy = "skill")
+private List<TaskSkill> taskSkills;
+Why @ManyToOne?
+Each Task-Skill mapping belongs to one Task and one Skill.
+Why @OneToMany?
+One Task can require multiple Skills, and one Skill can be required by multiple Tasks through this mapping table.
+
+9. Used By Forms
+Form
+Purpose
+Create Assignment â€“ Task Management
+Stores the required Skills for each Task.
+Preview Assignment
+Displays the required Skills of every Task.
+Assignment Generation
+Business Rule Engine compares Task Skills with Resource Skills before optimization.
+
+10. Business Rules
+Every Task-Skill mapping must reference a valid Task. 
+Every Task-Skill mapping must reference a valid Skill. 
+A Task can require multiple Skills. 
+A Skill can be required by multiple Tasks. 
+The combination of task_id and skill_id must be unique. 
+Every Task must have at least one required Skill before the Assignment can be generated. 
+Required Skills are selected from the Skill Master based on the selected Assignment Type. 
+The Business Rule Engine compares Task Skills with Resource Skills to determine eligible Resources. 
+
+11. Dummy Data
+task_skill_id
+task_id
+skill_id
+1
+1
+1 (Java)
+2
+1
+2 (Spring Boot)
+3
+1
+4 (MySQL)
+4
+2
+3 (React)
+5
+2
+5 (REST API)
+6
+3
+1 (Java)
+7
+3
+5 (REST API)
+8
+4
+6 (Testing)
+
+12. Why This Design? (Architectural Reasoning)
+Why create a separate task_skills table?
+A Task can require multiple Skills, and a Skill can be required by multiple Tasks. This is a Many-to-Many relationship that is resolved using a junction table to maintain database normalization.
+
+Why not store Skills directly in the tasks table?
+Storing multiple Skills in a single column (for example, "Java, Spring Boot, MySQL") violates the First Normal Form (1NF). It also makes searching, filtering, and joining inefficient. A separate mapping table provides a normalized and scalable solution.
+
+Why use a surrogate primary key instead of a composite key?
+Using task_skill_id simplifies Spring Data JPA entity mapping, repository operations, and future enhancements. Composite primary keys require @EmbeddedId or @IdClass, increasing implementation complexity.
+
+Why add a UNIQUE constraint on (task_id, skill_id)?
+This prevents assigning the same Skill multiple times to the same Task while allowing different Tasks to require the same Skill.
+
+Why doesn't this table store Skill Priority or Experience?
+The current Task Align system evaluates only whether a Resource possesses the required Skills. It does not consider experience, proficiency level, or skill priority. Therefore, these attributes are not required and would unnecessarily complicate the database.
+
+Why must every Task have at least one Skill?
+The Business Rule Engine determines Resource eligibility by comparing Task Required Skills with Resource Skills. Without at least one required Skill, the system cannot identify eligible Resources, making assignment generation impossible.
+
+Overall Design Justification
+The task_skills table provides a normalized mapping between Tasks and Skills and serves as one of the primary inputs to the Business Rule Engine. It enables accurate skill matching before executing the Hungarian Algorithm, prevents duplicate mappings through a unique constraint, and maintains a scalable database design. The table follows Third Normal Form (3NF) and is fully compatible with Spring Boot, Spring Data JPA, MySQL, JasperReports, and Apache POI.
+
+Table 11: Assignment Constraints
+1. Module
+Assignment Management
+
+2. Purpose
+The assignment_constraints table stores the business constraints defined for an Assignment before the resource allocation process begins.
+Each Assignment has one set of Constraints that define the maximum Budget, Timeline, and Working Days Per Month under which the Business Rule Engine and Hungarian Algorithm must generate the optimal resource allocation.
+These Constraints are validated after optimization to determine whether the generated Assignment satisfies the specified Budget and Timeline limits.
+Example
+Assignment
+E-Commerce Website Development
+Constraints
+Budget : â‚¹5,00,000 
+Timeline : 45 Days 
+Working Days Per Month : 22 
+
+3. Table Structure
+Column Name
+Data Type
+Constraints
+Description
+assignment_constraint_id
+BIGINT
+Primary Key, Auto Increment
+Unique identifier for each Assignment Constraint.
+assignment_id
+BIGINT
+Foreign Key, UNIQUE, NOT NULL
+References the Assignment.
+budget
+DECIMAL(12,2)
+NOT NULL
+Stores the maximum budget allocated for the Assignment.
+timeline_days
+INT
+NOT NULL
+Stores the maximum number of days allowed to complete the Assignment.
+working_days_per_month
+INT
+NOT NULL
+Stores the number of working days considered for salary-to-cost calculations.
+
+4. Explanation of Each Field
+assignment_constraint_id
+Purpose
+Uniquely identifies each Assignment Constraint record.
+Why BIGINT?
+Supports a large number of records. 
+Compatible with Spring Data JPA (Long). 
+Maintains consistency with other primary keys. 
+Why Primary Key?
+Provides a unique identifier for each Constraint record.
+
+assignment_id
+Purpose
+References the Assignment to which these Constraints belong.
+Example
+Website Development
+        â†“
+Budget
+Timeline
+Working Days
+Why BIGINT?
+Matches the Primary Key of the assignments table.
+Why Foreign Key?
+Ensures every Constraint belongs to a valid Assignment.
+Why UNIQUE?
+Each Assignment can have only one set of Constraints.
+This establishes a One-to-One relationship.
+
+budget
+Purpose
+Stores the maximum budget available for the Assignment.
+Example
+â‚¹5,00,000
+Why DECIMAL(12,2)?
+Budget is a monetary value.
+DECIMAL provides accurate financial calculations without floating-point precision issues.
+Why NOT NULL?
+Budget is mandatory for validating the generated Assignment.
+
+timeline_days
+Purpose
+Stores the maximum duration allowed for completing the Assignment.
+Example
+45 Days
+Why INT?
+Timeline is measured as a whole number of days.
+Why NOT NULL?
+Timeline is mandatory for validation after assignment generation.
+
+working_days_per_month
+Purpose
+Stores the number of working days used to calculate the Resource Cost Per Day.
+Example
+22 Days
+Why INT?
+Working Days is always a whole number.
+Why NOT NULL?
+The system requires this value to calculate Cost Per Day during Cost Minimization.
+Example
+Cost Per Day = Monthly Salary Ã· Working Days Per Month
+
+5. Primary Key
+Column
+assignment_constraint_id
+
+6. Foreign Keys
+Column
+References
+Relationship
+assignment_id
+assignments.assignment_id
+One-to-One
+
+7. Database Relationships
+Parent Table
+Child Table
+Relationship
+assignments
+assignment_constraints
+One-to-One
+
+Relationship Diagram
+assignments (1)
+      â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ assignment_constraints (1)
+
+8. Spring Data JPA Mapping
+AssignmentConstraint Entity
+@OneToOne
+@JoinColumn(name = "assignment_id")
+private Assignment assignment;
+Assignment Entity
+@OneToOne(mappedBy = "assignment")
+private AssignmentConstraint assignmentConstraint;
+Why @OneToOne?
+Each Assignment has exactly one set of Constraints, and each Constraint belongs to exactly one Assignment.
+
+9. Used By Forms
+Form
+Purpose
+Create Assignment â€“ Assignment Constraints
+Stores Budget, Timeline, and Working Days Per Month.
+Preview Assignment
+Displays the defined Constraints before generation.
+Assignment Results Screen
+Compares the generated Assignment against the defined Constraints.
+
+10. Business Rules
+Every Assignment must have exactly one set of Constraints. 
+Budget is mandatory and must be greater than zero. 
+Timeline (Days) is mandatory and must be greater than zero. 
+Working Days Per Month is mandatory and must be greater than zero. 
+Constraints can be created or modified only while the Assignment is in DRAFT status. 
+Once an Assignment is COMPLETED, Constraints become read-only. 
+Budget and Timeline are validated after optimization to determine whether the generated Assignment satisfies the specified limits. 
+Working Days Per Month is used to calculate Resource Cost Per Day during Cost Minimization. 
+
+11. Dummy Data
+assignment_constraint_id
+assignment_id
+budget
+timeline_days
+working_days_per_month
+1
+1
+500000.00
+45
+22
+2
+2
+750000.00
+60
+24
+3
+3
+1200000.00
+90
+26
+
+12. Why This Design? (Architectural Reasoning)
+Why create a separate Assignment Constraints table?
+Budget, Timeline, and Working Days are business constraints that control the optimization process. Keeping them separate from the Assignment's basic information maintains database normalization and allows the Assignment entity to remain focused on identification and configuration.
+
+Why is this a One-to-One relationship?
+Each Assignment can have only one Budget, one Timeline, and one Working Days Per Month value. Therefore, a single Constraint record is sufficient for each Assignment.
+
+Why isn't Optimization Type stored here?
+Optimization Type defines the optimization strategy (Cost Minimization or Profit Maximization) and is an attribute of the Assignment itself. Budget, Timeline, and Working Days are operational limits that the optimization process must satisfy. Therefore, Optimization Type belongs in the assignments table, while these values belong in assignment_constraints.
+
+Why aren't Total Cost, Remaining Budget, Budget Status, or Timeline Status stored here?
+These values are calculated after the Business Rule Engine and Hungarian Algorithm complete the optimization process.
+For example:
+Total Assignment Cost is calculated from the selected Resources and Task durations. 
+Remaining Budget is derived by subtracting the Total Assignment Cost from the Budget. 
+Budget Status and Timeline Status are validation results. 
+Since they are derived values, storing them in this table would introduce redundancy and violate database normalization.
+
+Why is Working Days Per Month stored here?
+Working Days Per Month varies between Assignments and is used to calculate the Cost Per Day of each Resource.
+Example:
+Cost Per Day = Monthly Salary Ã· Working Days Per Month
+Keeping this value at the Assignment level allows the same Resource to participate in different Assignments that may have different working schedules.
+
+Overall Design Justification
+The assignment_constraints table centralizes all business constraints required for Assignment optimization. It provides the Budget, Timeline, and Working Days Per Month used by the Business Rule Engine, Hungarian Algorithm, and validation logic while maintaining a normalized One-to-One relationship with the assignments table. The design follows Third Normal Form (3NF), avoids storing derived values, and is fully compatible with Spring Boot, Spring Data JPA, MySQL, JasperReports, and Apache POI.
+
+

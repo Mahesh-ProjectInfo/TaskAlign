@@ -1,0 +1,89 @@
+# Sprint Status
+
+## Current Sprint
+Sprint 6 - Preview Assignment
+
+## Status
+Completed & Frozen
+
+---
+
+## Sprint 1 Features Summary (Completed & Frozen)
+
+| Feature ID | Feature Name | Status | Endpoints |
+|---|---|---|---|
+| Feature 1 | Create Assignment | Completed & Frozen | POST /api/v1/assignments |
+| Feature 2 | View All Assignments | Completed & Frozen | GET /api/v1/assignments |
+| Feature 3 | View Assignment by ID | Completed & Frozen | GET /api/v1/assignments/{assignmentId} |
+| Feature 4 | Update Assignment | Completed & Frozen | PUT /api/v1/assignments/{assignmentId} |
+| Feature 5 | Soft Delete Assignment | Completed & Frozen | DELETE /api/v1/assignments/{assignmentId} |
+
+---
+
+## Sprint 2 Features Summary (Completed & Frozen)
+
+| Feature ID | Feature Name | Status | Endpoints |
+|---|---|---|---|
+| Feature 1 | Add Resources to Assignment | Completed & Frozen | POST /api/v1/assignments/{assignmentId}/resources |
+| Feature 2 | View Assignment Resources | Completed & Frozen | GET /api/v1/assignments/{assignmentId}/resources |
+| Feature 3 | Update Assignment Resources | Completed & Frozen | PUT /api/v1/assignments/{assignmentId}/resources |
+| Feature 4 | Remove Assignment Resources | Completed & Frozen | DELETE /api/v1/assignments/{assignmentId}/resources |
+
+---
+
+## Sprint 3 Features Summary (Completed & Frozen)
+
+| Feature ID | Feature Name | Status | Endpoints |
+|---|---|---|---|
+| Feature 1 | Create Task | Completed & Frozen | POST /api/v1/assignments/{assignmentId}/tasks |
+| Feature 2 | View Tasks | Completed & Frozen | GET /api/v1/assignments/{assignmentId}/tasks |
+| Feature 3 | Update Task | Completed & Frozen | PUT /api/v1/assignments/{assignmentId}/tasks/{taskId} |
+| Feature 4 | Delete Task | Completed & Frozen | DELETE /api/v1/assignments/{assignmentId}/tasks/{taskId} |
+
+---
+
+## Sprint 4 Features Summary (Completed & Frozen)
+
+| Feature ID | Feature Name | Status | Endpoints |
+|---|---|---|---|
+| Feature 1 | Assign Skills to Task | Completed & Frozen | POST /api/v1/tasks/{taskId}/skills |
+| Feature 2 | View Task Skills | Completed & Frozen | GET /api/v1/tasks/{taskId}/skills |
+| Feature 3 | Update Task Skills | Completed & Frozen | PUT /api/v1/tasks/{taskId}/skills |
+| Feature 4 | Remove Task Skills | Completed & Frozen | DELETE /api/v1/tasks/{taskId}/skills |
+
+---
+
+## Sprint 5 Features Summary (Completed & Frozen)
+
+| Feature ID | Feature Name | Status | Endpoints |
+|---|---|---|---|
+| Feature 1 | Create Assignment Constraint | Completed & Frozen | POST /api/v1/assignments/{assignmentId}/constraints |
+| Feature 2 | View Assignment Constraints | Completed & Frozen | GET /api/v1/assignments/{assignmentId}/constraints |
+| Feature 3 | Update Assignment Constraint | Completed & Frozen | PUT /api/v1/assignments/{assignmentId}/constraints/{constraintId} |
+| Feature 4 | Delete Assignment Constraint | Completed & Frozen | DELETE /api/v1/assignments/{assignmentId}/constraints/{constraintId} |
+
+---
+
+## Sprint 6 Features Summary (Completed & Frozen)
+
+| Feature ID | Feature Name | Status | Endpoints |
+|---|---|---|---|
+| Feature 1 | Retrieve Assignment Details | Completed & Frozen | GET /api/v1/assignments/{assignmentId}/preview |
+| Feature 2 | Retrieve Assignment Resources | Completed & Frozen | GET /api/v1/assignments/{assignmentId}/preview |
+| Feature 3 | Retrieve Tasks with Task Skills | Completed & Frozen | GET /api/v1/assignments/{assignmentId}/preview |
+| Feature 4 | Retrieve Assignment Constraints | Completed & Frozen | GET /api/v1/assignments/{assignmentId}/preview |
+| Feature 5 | Generate Complete Preview Response | Completed & Frozen | GET /api/v1/assignments/{assignmentId}/preview |
+
+---
+
+## Delivered Components (Sprint 6)
+
+- **DTOs**: `PreviewAssignmentResponse.java`, `PreviewTaskResponse.java`
+- **Service**: `PreviewAssignmentService.java`, `PreviewAssignmentServiceImpl.java` (orchestrates `AssignmentRepository`, `AssignmentResourceService`, `TaskService`, `TaskSkillService`, `AssignmentConstraintService`)
+- **Controller**: `PreviewAssignmentController.java` (`GET /api/v1/assignments/{assignmentId}/preview`)
+- **Mapper**: `PreviewAssignmentMapper.java`
+
+---
+
+## Next Sprint
+Sprint 7 - Business Rule Engine

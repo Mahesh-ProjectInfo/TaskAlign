@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="assignment_report" pageWidth="595" pageHeight="842" columnWidth="555"
+              leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20"
+              uuid="a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d">
+
+    <property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+
+    <!-- Parameters -->
+    <parameter name="ASSIGNMENT_NAME" class="java.lang.String"/>
+    <parameter name="ASSIGNMENT_TYPE" class="java.lang.String"/>
+    <parameter name="OPTIMIZATION_TYPE" class="java.lang.String"/>
+    <parameter name="IS_PROFIT" class="java.lang.Boolean"/>
+    <parameter name="BUDGET" class="java.lang.String"/>
+    <parameter name="TIMELINE" class="java.lang.String"/>
+    <parameter name="WORKING_DAYS" class="java.lang.String"/>
+    <parameter name="TOTAL_RESOURCES" class="java.lang.Integer"/>
+    <parameter name="TOTAL_TASKS" class="java.lang.Integer"/>
+    <parameter name="TOTAL_COST" class="java.lang.String"/>
+    <parameter name="TOTAL_SAVED_MONEY" class="java.lang.String"/>
+    <parameter name="BUDGET_STATUS" class="java.lang.String"/>
+    <parameter name="TIMELINE_STATUS" class="java.lang.String"/>
+    <parameter name="EXECUTION_TIME" class="java.lang.String"/>
+    <parameter name="ASSIGNMENT_STATUS" class="java.lang.String"/>
+    <parameter name="PROFIT_MATRIX_HTML" class="java.lang.String"/>
+
+    <!-- Fields -->
+    <field name="resourceName" class="java.lang.String"/>
+    <field name="taskName" class="java.lang.String"/>
+    <field name="role" class="java.lang.String"/>
+    <field name="estimatedDays" class="java.lang.String"/>
+    <field name="assignedCost" class="java.lang.String"/>
+    <field name="savedMoney" class="java.lang.String"/>
+
+    <title>
+        <band height="210" splitType="Stretch">
+            <!-- Header Banner -->
+            <rectangle radius="6">
+                <reportElement x="0" y="0" width="555" height="50" backcolor="#1E293B" mode="Opaque" uuid="b1c2d3e4-f5a6-7b8c-9d0e-1f2a3b4c5d6e"/>
+                <graphicElement><pen lineWidth="0.0"/></graphicElement>
+            </rectangle>
+            <staticText>
+                <reportElement x="15" y="10" width="200" height="30" forecolor="#FFFFFF" uuid="c1d2e3f4-a5b6-7c8d-9e0f-1a2b3c4d5e6f"/>
+                <textElement verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="18" isBold="true"/>
+                </textElement>
+                <text><![CDATA[TASK ALIGN]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="250" y="15" width="290" height="20" forecolor="#94A3B8" uuid="d1e2f3a4-b5c6-7d8e-9f0a-1b2c3d4e5f6a"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="11" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Strategy: " + $P{OPTIMIZATION_TYPE}]]></textFieldExpression>
+            </textField>
+
+            <!-- Assignment Summary Card -->
+            <rectangle radius="4">
+                <reportElement x="0" y="60" width="555" height="60" backcolor="#F8FAFC" uuid="e1f2a3b4-c5d6-7e8f-9a0b-1c2d3e4f5a6b"/>
+                <graphicElement><pen lineWidth="1.0" lineColor="#E2E8F0"/></graphicElement>
+            </rectangle>
+            <staticText>
+                <reportElement x="10" y="65" width="100" height="15" forecolor="#64748B" uuid="f1a2b3c4-d5e6-7f8a-9b0c-1d2e3f4a5b6c"/>
+                <textElement><font fontName="SansSerif" size="9" isBold="true"/></textElement>
+                <text><![CDATA[ASSIGNMENT NAME]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="10" y="80" width="180" height="18" forecolor="#0F172A" uuid="a2b3c4d5-e6f7-8a9b-0c1d-2e3f4a5b6c7d"/>
+                <textElement><font fontName="SansSerif" size="12" isBold="true"/></textElement>
+                <textFieldExpression><![CDATA[$P{ASSIGNMENT_NAME}]]></textFieldExpression>
+            </textField>
+
+            <staticText>
+                <reportElement x="200" y="65" width="100" height="15" forecolor="#64748B" uuid="b2c3d4e5-f6a7-8b9c-0d1e-2f3a4b5c6d7e"/>
+                <textElement><font fontName="SansSerif" size="9" isBold="true"/></textElement>
+                <text><![CDATA[ASSIGNMENT TYPE]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="200" y="80" width="140" height="18" forecolor="#0F172A" uuid="c2d3e4f5-a6b7-8c9d-0e1f-2a3b4c5d6e7f"/>
+                <textElement><font fontName="SansSerif" size="11" isBold="false"/></textElement>
+                <textFieldExpression><![CDATA[$P{ASSIGNMENT_TYPE}]]></textFieldExpression>
+            </textField>
+
+            <staticText>
+                <reportElement x="350" y="65" width="90" height="15" forecolor="#64748B" uuid="d2e3f4a5-b6c7-8d9e-0f1a-2b3c4d5e6f7a"/>
+                <textElement><font fontName="SansSerif" size="9" isBold="true"/></textElement>
+                <text><![CDATA[BUDGET]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="350" y="80" width="90" height="18" forecolor="#0F172A" uuid="e2f3a4b5-c6d7-8e9f-0a1b-2c3d4e5f6a7b"/>
+                <textElement><font fontName="SansSerif" size="11" isBold="true"/></textElement>
+                <textFieldExpression><![CDATA[$P{BUDGET}]]></textFieldExpression>
+            </textField>
+
+            <staticText>
+                <reportElement x="450" y="65" width="95" height="15" forecolor="#64748B" uuid="f2a3b4c5-d6e7-8f9a-0b1c-2d3e4f5a6b7c"/>
+                <textElement><font fontName="SansSerif" size="9" isBold="true"/></textElement>
+                <text><![CDATA[TIMELINE]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="450" y="80" width="95" height="18" forecolor="#0F172A" uuid="a3b4c5d6-e7f8-9a0b-1c2d-3e4f5a6b7c8d"/>
+                <textElement><font fontName="SansSerif" size="11" isBold="true"/></textElement>
+                <textFieldExpression><![CDATA[$P{TIMELINE}]]></textFieldExpression>
+            </textField>
+
+            <!-- Key Metrics Grid -->
+            <rectangle radius="4">
+                <reportElement x="0" y="130" width="555" height="70" backcolor="#FFFFFF" uuid="b3c4d5e6-f7a8-9b0c-1d2e-3f4a5b6c7d8e"/>
+                <graphicElement><pen lineWidth="1.0" lineColor="#CBD5E1"/></graphicElement>
+            </rectangle>
+
+            <!-- Metric 1: Total Resources -->
+            <staticText>
+                <reportElement x="10" y="138" width="80" height="14" forecolor="#64748B" uuid="c3d4e5f6-a7b8-9c0d-1e2f-3a4b5c6d7e8f"/>
+                <textElement><font fontName="SansSerif" size="8" isBold="true"/></textElement>
+                <text><![CDATA[RESOURCES]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="10" y="152" width="80" height="20" forecolor="#1E40AF" uuid="d3e4f5a6-b7c8-9d0e-1f2a-3b4c5d6e7f8a"/>
+                <textElement><font fontName="SansSerif" size="12" isBold="true"/></textElement>
+                <textFieldExpression><![CDATA[$P{TOTAL_RESOURCES}]]></textFieldExpression>
+            </textField>
+
+            <!-- Metric 2: Total Tasks -->
+            <staticText>
+                <reportElement x="95" y="138" width="80" height="14" forecolor="#64748B" uuid="e3f4a5b6-c7d8-9e0f-1a2b-3c4d5e6f7a8b"/>
+                <textElement><font fontName="SansSerif" size="8" isBold="true"/></textElement>
+                <text><![CDATA[TASKS]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="95" y="152" width="80" height="20" forecolor="#4338CA" uuid="f3a4b5c6-d7e8-9f0a-1b2c-3d4e5f6a7b8c"/>
+                <textElement><font fontName="SansSerif" size="12" isBold="true"/></textElement>
+                <textFieldExpression><![CDATA[$P{TOTAL_TASKS}]]></textFieldExpression>
+            </textField>
+
+            <!-- Metric 3: Total Cost -->
+            <staticText>
+                <reportElement x="180" y="138" width="100" height="14" forecolor="#64748B" uuid="a4b5c6d7-e8f9-0a1b-2c3d-4e5f6a7b8c9d"/>
+                <textElement><font fontName="SansSerif" size="8" isBold="true"/></textElement>
+                <text><![CDATA[TOTAL COST]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="180" y="152" width="100" height="20" forecolor="#15803D" uuid="b4c5d6e7-f8a9-0b1c-2d3e-4f5a6b7c8d9e"/>
+                <textElement><font fontName="SansSerif" size="12" isBold="true"/></textElement>
+                <textFieldExpression><![CDATA[$P{TOTAL_COST}]]></textFieldExpression>
+            </textField>
+
+            <!-- Metric 4: Budget Status -->
+            <staticText>
+                <reportElement x="285" y="138" width="85" height="14" forecolor="#64748B" uuid="c4d5e6f7-a8b9-0c1d-2e3f-4a5b6c7d8e9f"/>
+                <textElement><font fontName="SansSerif" size="8" isBold="true"/></textElement>
+                <text><![CDATA[BUDGET STATUS]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="285" y="152" width="85" height="20" forecolor="#047857" uuid="d4e5f6a7-b8c9-0d1e-2f3a-4b5c6d7e8f9a"/>
+                <textElement><font fontName="SansSerif" size="10" isBold="true"/></textElement>
+                <textFieldExpression><![CDATA[$P{BUDGET_STATUS}]]></textFieldExpression>
+            </textField>
+
+            <!-- Metric 5: Timeline Status -->
+            <staticText>
+                <reportElement x="375" y="138" width="85" height="14" forecolor="#64748B" uuid="e4f5a6b7-c8d9-0e1f-2a3b-4c5d6e7f8a9b"/>
+                <textElement><font fontName="SansSerif" size="8" isBold="true"/></textElement>
+                <text><![CDATA[TIMELINE STATUS]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="375" y="152" width="85" height="20" forecolor="#047857" uuid="f4a5b6c7-d8e9-0f1a-2b3c-4d5e6f7a8b9c"/>
+                <textElement><font fontName="SansSerif" size="10" isBold="true"/></textElement>
+                <textFieldExpression><![CDATA[$P{TIMELINE_STATUS}]]></textFieldExpression>
+            </textField>
+
+            <!-- Metric 6: Total Saved Money (Profit Only) -->
+            <textField>
+                <reportElement x="465" y="138" width="80" height="14" forecolor="#64748B" uuid="a5b6c7d8-e9f0-1a2b-3c4d-5e6f7a8b9c0d">
+                    <printWhenExpression><![CDATA[$P{IS_PROFIT}]]></printWhenExpression>
+                </reportElement>
+                <textElement><font fontName="SansSerif" size="8" isBold="true"/></textElement>
+                <textFieldExpression><![CDATA["SAVED MONEY"]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="465" y="152" width="80" height="20" forecolor="#047857" uuid="b5c6d7e8-f9a0-1b2c-3d4e-5f6a7b8c9d0e">
+                    <printWhenExpression><![CDATA[$P{IS_PROFIT}]]></printWhenExpression>
+                </reportElement>
+                <textElement><font fontName="SansSerif" size="10" isBold="true"/></textElement>
+                <textFieldExpression><![CDATA[$P{TOTAL_SAVED_MONEY}]]></textFieldExpression>
+            </textField>
+        </band>
+    </title>
+
+    <!-- Page Header (Profit Optimization Matrix Section - Removed from PDF per requirement) -->
+    <pageHeader>
+        <band height="0" splitType="Stretch"/>
+    </pageHeader>
+
+    <!-- Column Header for Optimized Allocation Table -->
+    <columnHeader>
+        <band height="30" splitType="Stretch">
+            <staticText>
+                <reportElement x="0" y="0" width="555" height="16" forecolor="#0F172A" uuid="f5a6b7c8-d9e0-1f2a-3b4c-5d6e7f8a9b0c"/>
+                <textElement><font fontName="SansSerif" size="11" isBold="true"/></textElement>
+                <text><![CDATA[Optimized Assignment]]></text>
+            </staticText>
+            <rectangle>
+                <reportElement x="0" y="16" width="555" height="14" backcolor="#F1F5F9" uuid="a6b7c8d9-e0f1-2a3b-4c5d-6e7f8a9b0c1d"/>
+                <graphicElement><pen lineWidth="0.5" lineColor="#CBD5E1"/></graphicElement>
+            </rectangle>
+            <staticText>
+                <reportElement x="5" y="16" width="115" height="14" forecolor="#475569" uuid="b6c7d8e9-f0a1-2b3c-4d5e-6f7a8b9c0d1e"/>
+                <textElement verticalAlignment="Middle"><font fontName="SansSerif" size="8" isBold="true"/></textElement>
+                <text><![CDATA[RESOURCE]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="120" y="16" width="115" height="14" forecolor="#475569" uuid="c6d7e8f9-a0b1-2c3d-4e5f-6a7b8c9d0e1f"/>
+                <textElement verticalAlignment="Middle"><font fontName="SansSerif" size="8" isBold="true"/></textElement>
+                <text><![CDATA[ASSIGNED TASK]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="235" y="16" width="90" height="14" forecolor="#475569" uuid="d6e7f8a9-b0c1-2d3e-4f5a-6b7c8d9e0f1a"/>
+                <textElement verticalAlignment="Middle"><font fontName="SansSerif" size="8" isBold="true"/></textElement>
+                <text><![CDATA[ROLE]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="325" y="16" width="75" height="14" forecolor="#475569" uuid="e6f7a8b9-c0d1-2e3f-4a5b-6c7d8e9f0a1b"/>
+                <textElement verticalAlignment="Middle"><font fontName="SansSerif" size="8" isBold="true"/></textElement>
+                <text><![CDATA[EST. DAYS]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="400" y="16" width="75" height="14" forecolor="#475569" uuid="f6a7b8c9-d0e1-2f3a-4b5c-6d7e8f9a0b1c"/>
+                <textElement verticalAlignment="Middle"><font fontName="SansSerif" size="8" isBold="true"/></textElement>
+                <textFieldExpression><![CDATA[$P{IS_PROFIT} ? "COST" : "COST"]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="475" y="16" width="75" height="14" forecolor="#475569" uuid="a7b8c9d0-e1f2-3a4b-5c6d-7e8f9a0b1c2d">
+                    <printWhenExpression><![CDATA[$P{IS_PROFIT}]]></printWhenExpression>
+                </reportElement>
+                <textElement verticalAlignment="Middle"><font fontName="SansSerif" size="8" isBold="true"/></textElement>
+                <textFieldExpression><![CDATA["SAVED MONEY"]]></textFieldExpression>
+            </textField>
+        </band>
+    </columnHeader>
+
+    <!-- Detail Band -->
+    <detail>
+        <band height="18" splitType="Stretch">
+            <rectangle>
+                <reportElement x="0" y="0" width="555" height="18" backcolor="#FFFFFF" uuid="b7c8d9e0-f1a2-3b4c-5d6e-7f8a9b0c1d2e"/>
+                <graphicElement><pen lineWidth="0.5" lineColor="#E2E8F0"/></graphicElement>
+            </rectangle>
+            <textField>
+                <reportElement x="5" y="2" width="115" height="14" forecolor="#0F172A" uuid="c7d8e9f0-a1b2-3c4d-5e6f-7a8b9c0d1e2f"/>
+                <textElement verticalAlignment="Middle"><font fontName="SansSerif" size="9" isBold="true"/></textElement>
+                <textFieldExpression><![CDATA[$F{resourceName}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="120" y="2" width="115" height="14" forecolor="#334155" uuid="d7e8f9a0-b1c2-3d4e-5f6a-7b8c9d0e1f2a"/>
+                <textElement verticalAlignment="Middle"><font fontName="SansSerif" size="9"/></textElement>
+                <textFieldExpression><![CDATA[$F{taskName}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="235" y="2" width="90" height="14" forecolor="#334155" uuid="e7f8a9b0-c1d2-3e4f-5a6b-7c8d9e0f1a2b"/>
+                <textElement verticalAlignment="Middle"><font fontName="SansSerif" size="9"/></textElement>
+                <textFieldExpression><![CDATA[$F{role}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="325" y="2" width="75" height="14" forecolor="#334155" uuid="f7a8b9c0-d1e2-3f4a-5b6c-7d8e9f0a1b2c"/>
+                <textElement verticalAlignment="Middle"><font fontName="SansSerif" size="9"/></textElement>
+                <textFieldExpression><![CDATA[$F{estimatedDays}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="400" y="2" width="75" height="14" forecolor="#1D4ED8" uuid="a8b9c0d1-e2f3-4a5b-6c7d-8e9f0a1b2c3d"/>
+                <textElement verticalAlignment="Middle"><font fontName="SansSerif" size="9" isBold="true"/></textElement>
+                <textFieldExpression><![CDATA[$F{assignedCost}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="475" y="2" width="75" height="14" forecolor="#047857" uuid="b8c9d0e1-f2a3-4b5c-6d7e-8f9a0b1c2d3e">
+                    <printWhenExpression><![CDATA[$P{IS_PROFIT}]]></printWhenExpression>
+                </reportElement>
+                <textElement verticalAlignment="Middle"><font fontName="SansSerif" size="9" isBold="true"/></textElement>
+                <textFieldExpression><![CDATA[$F{savedMoney}]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+
+    <!-- Page Footer -->
+    <pageFooter>
+        <band height="30" splitType="Stretch">
+            <line>
+                <reportElement x="0" y="5" width="555" height="1" forecolor="#CBD5E1" uuid="c8d9e0f1-a2b3-4c5d-6e7f-8a9b0c1d2e3f"/>
+            </line>
+            <staticText>
+                <reportElement x="0" y="10" width="250" height="15" forecolor="#94A3B8" uuid="d8e9f0a1-b2c3-4d5e-6f7a-8b9c0d1e2f3a"/>
+                <textElement><font fontName="SansSerif" size="8"/></textElement>
+                <text><![CDATA[TaskAlign Application • Automated Optimization Report]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="435" y="10" width="120" height="15" forecolor="#94A3B8" uuid="e8f9a0b1-c2d3-4e5f-6a7b-8c9d0e1f2a3b"/>
+                <textElement textAlignment="Right"><font fontName="SansSerif" size="8"/></textElement>
+                <textFieldExpression><![CDATA["Page " + $V{PAGE_NUMBER}]]></textFieldExpression>
+            </textField>
+        </band>
+    </pageFooter>
+
+</jasperReport>

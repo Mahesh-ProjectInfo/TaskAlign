@@ -1,0 +1,2152 @@
+{
+  "info": {
+    "_postman_id": "160653ff-79eb-47c3-a365-fb05cbc9bab1",
+    "name": "Task Align - final postman collection(1-4)",
+    "description": "Unified Postman Collection for Task Align Backend covering all endpoints across Member 1 (Authentication), Member 2 (Master Data & Reports), and Member 3 (Assignment Management, Resources, Tasks, Task Skills, Constraints, Preview, and Sprint 7 Business Rule Engine).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "49137660",
+    "_collection_link": "https://go.postman.co/collection/49137660-160653ff-79eb-47c3-a365-fb05cbc9bab1?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Authentication (Member 1)",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"srujan\",\n  \"email\": \"kannamsrujan16@gmail.com\",\n  \"mobileNumber\": \"8897790325\",\n  \"gender\": \"MALE\",\n  \"state\": \"Telangana\",\n  \"country\": \"India\",\n  \"password\": \"Password@123\",\n  \"confirmPassword\": \"Password@123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var responseData = pm.response.json();",
+                  "if (responseData.data && responseData.data.token) {",
+                  "    pm.collectionVariables.set(\"bearer_token\", responseData.data.token);",
+                  "    console.log(\"Bearer token auto-saved: \" + responseData.data.token);",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"kannamsrujan16@gmail.com\",\n  \"password\": \"Password@123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Send Mobile OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mobileNumber\": \"9876543999\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/send-mobile-otp",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "send-mobile-otp"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Mobile Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mobileNumber\": \"9876543999\",\n  \"otp\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/mobile-login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "mobile-login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Forgot Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin.tester2026@taskalign.com\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/forgot-password",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "forgot-password"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Verify OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin.tester2026@taskalign.com\",\n  \"otp\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/verify-otp",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "verify-otp"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reset Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin.tester2026@taskalign.com\",\n  \"otp\": \"123456\",\n  \"newPassword\": \"NewPassword@123\",\n  \"confirmPassword\": \"NewPassword@123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/reset-password",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "reset-password"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Edit Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearer_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"System Admin Updated\",\n  \"mobileNumber\": \"9876543999\",\n  \"gender\": \"MALE\",\n  \"state\": \"Telangana\",\n  \"country\": \"India\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/edit-profile",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "edit-profile"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearer_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"Password@123\",\n  \"newPassword\": \"NewPassword@123\",\n  \"confirmPassword\": \"NewPassword@123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/change-password",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "change-password"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Master Data & Reports (Member 2)",
+      "item": [
+        {
+          "name": "Assignment Types",
+          "item": [
+            {
+              "name": "Create Assignment Type",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"assignmentTypeName\": \"Software Project Assignment\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/assignment-types",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "assignment-types"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "View All Assignment Types",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/assignment-types",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "assignment-types"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "View Assignment Type By ID",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/assignment-types/1",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "assignment-types",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Assignment Type",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"assignmentTypeName\": \"Software Project\",\n  \"description\": \"Updated Description\",\n  \"status\": true\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/assignment-types/1",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "assignment-types",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Assignment Type",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/assignment-types/1",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "assignment-types",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Role Master",
+          "item": [
+            {
+              "name": "Create Role",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"assignmentTypeId\": 1,\n  \"roleName\": \"Frontend Developer\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/roles",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "roles"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "View All Roles",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/roles",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "roles"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "View Role By ID",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/roles/1",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "roles",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Role",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"assignmentTypeId\": 1,\n  \"roleName\": \"Senior Java Developer\",\n \n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/roles/1",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "roles",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Role",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/roles/1",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "roles",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Skill Master",
+          "item": [
+            {
+              "name": "Create Skill",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"assignmentTypeId\": 1,\n  \"skillName\": \"Java\"\n  \n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/skills",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "skills"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "View All Skills",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/skills",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "skills"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "View Skill By ID",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/skills/1",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "skills",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Skill",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"assignmentTypeId\": 1,\n  \"skillName\": \"Advanced Java\",\n  \"skillCode\": \"SK001\",\n  \"description\": \"Updated Java Programming\",\n  \"status\": true\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/skills/1",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "skills",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Skill",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/skills/1",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "skills",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Resource Management",
+          "item": [
+            {
+              "name": "Create Resource",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"employeeId\": \"EMP001\",\n  \"resourceName\": \"Aarav Sharma\",\n  \"email\": \"aarav@gmail.com\",\n  \"mobile\": \"9876543210\",\n  \"assignmentTypeId\": 1,\n  \"roleId\": 1,\n  \"skillIds\": [1, 2],\n  \"experience\": 5,\n  \"monthlySalary\": 90000.00,\n  \"performanceRating\": 88.00,\n  \"availability\": true,\n  \"status\": true\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/resources",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "resources"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "View All Resources",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/resources",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "resources"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "View Resource By ID",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/resources/1",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "resources",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Filter By Role",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/resources/role/1",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "resources",
+                    "role",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Filter By Skill",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/resources/skill/1",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "resources",
+                    "skill",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Filter By Availability",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/resources/availability/true",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "resources",
+                    "availability",
+                    "true"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Search Resource By Name",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/resources/search?name=Aarav",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "resources",
+                    "search"
+                  ],
+                  "query": [
+                    {
+                      "key": "name",
+                      "value": "Aarav"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Resource",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"employeeId\": \"EMP001\",\n  \"resourceName\": \"Aarav Sharma Updated\",\n  \"email\": \"aarav@gmail.com\",\n  \"mobile\": \"9876543210\",\n  \"assignmentTypeId\": 1,\n  \"roleId\": 1,\n  \"skillIds\": [1, 2],\n  \"experience\": 6,\n  \"monthlySalary\": 95000.00,\n  \"performanceRating\": 90.00,\n  \"availability\": true,\n  \"status\": true\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/resources/1",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "resources",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Resource",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/resources/1",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "resources",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Bulk Upload",
+          "item": [
+            {
+              "name": "Upload Resources Excel",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "file",
+                      "type": "file",
+                      "value": ""
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/bulk-upload/resources",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "bulk-upload",
+                    "resources"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Report Management",
+          "item": [
+            {
+              "name": "Download PDF Report",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/report/pdf/{{assignment_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "report",
+                    "pdf",
+                    "{{assignment_id}}"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Download Excel Report",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{bearer_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/report/excel/{{assignment_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "report",
+                    "excel",
+                    "{{assignment_id}}"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Assignment Management (Member 3)",
+      "item": [
+        {
+          "name": "Create Assignment",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var responseData = pm.response.json();",
+                  "if (responseData.assignmentId) {",
+                  "    pm.collectionVariables.set(\"assignment_id\", responseData.assignmentId);",
+                  "    console.log(\"Assignment ID auto-saved: \" + responseData.assignmentId);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearer_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"assignmentName\": \"AWS Kubernetes Migration Phase 1\",\n  \"assignmentTypeId\": 1,\n  \"optimizationType\": \"COST_MINIMIZATION\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/assignments",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "assignments"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Assignment By ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearer_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/assignments/{{assignment_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "assignments",
+                "{{assignment_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Assignments",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearer_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/assignments",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "assignments"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Assignment",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearer_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"assignmentName\": \"AWS Kubernetes Migration Phase 1 Updated\",\n  \"assignmentTypeId\": 1,\n  \"optimizationType\": \"PROFIT_MAXIMIZATION\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/assignments/{{assignment_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "assignments",
+                "{{assignment_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Preview Assignment",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearer_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/assignments/{{assignment_id}}/preview",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "assignments",
+                "{{assignment_id}}",
+                "preview"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Assignment",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearer_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/assignments/{{assignment_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "assignments",
+                "{{assignment_id}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Assignment Resources (Member 3)",
+      "item": [
+        {
+          "name": "Add Resource",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearer_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resourceIds\": [1]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/assignments/{{assignment_id}}/resources",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "assignments",
+                "{{assignment_id}}",
+                "resources"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Assignment Resources",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearer_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/assignments/{{assignment_id}}/resources",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "assignments",
+                "{{assignment_id}}",
+                "resources"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Resource",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearer_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resourceIds\": [1]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/assignments/{{assignment_id}}/resources",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "assignments",
+                "{{assignment_id}}",
+                "resources"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Remove Resource",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearer_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resourceIds\": [1]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/assignments/{{assignment_id}}/resources",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "assignments",
+                "{{assignment_id}}",
+                "resources"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Tasks (Member 3)",
+      "item": [
+        {
+          "name": "Create Task",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var responseData = pm.response.json();",
+                  "if (responseData.taskId) {",
+                  "    pm.collectionVariables.set(\"task_id\", responseData.taskId);",
+                  "    console.log(\"Task ID auto-saved: \" + responseData.taskId);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearer_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"taskName\": \"Cluster Provisioning & Helm Setup\",\n  \"estimatedDays\": 10\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/assignments/{{assignment_id}}/tasks",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "assignments",
+                "{{assignment_id}}",
+                "tasks"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Tasks",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearer_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/assignments/{{assignment_id}}/tasks",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "assignments",
+                "{{assignment_id}}",
+                "tasks"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Task",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearer_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"taskName\": \"Cluster Provisioning & Helm Setup Updated\",\n  \"estimatedDays\": 12\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/assignments/{{assignment_id}}/tasks/{{task_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "assignments",
+                "{{assignment_id}}",
+                "tasks",
+                "{{task_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Task",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearer_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/assignments/{{assignment_id}}/tasks/{{task_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "assignments",
+                "{{assignment_id}}",
+                "tasks",
+                "{{task_id}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Task Skills (Member 3)",
+      "item": [
+        {
+          "name": "Add Skill to Task",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearer_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"skillIds\": [1]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/tasks/{{task_id}}/skills",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tasks",
+                "{{task_id}}",
+                "skills"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Task Skills",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearer_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/tasks/{{task_id}}/skills",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tasks",
+                "{{task_id}}",
+                "skills"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Task Skill",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearer_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"skillIds\": [1]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/tasks/{{task_id}}/skills",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tasks",
+                "{{task_id}}",
+                "skills"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Remove Task Skill",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearer_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"skillIds\": [1]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/tasks/{{task_id}}/skills",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tasks",
+                "{{task_id}}",
+                "skills"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Assignment Constraints (Member 3)",
+      "item": [
+        {
+          "name": "Create Constraint",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var responseData = pm.response.json();",
+                  "if (responseData.assignmentConstraintId) {",
+                  "    pm.collectionVariables.set(\"constraint_id\", responseData.assignmentConstraintId);",
+                  "    console.log(\"Constraint ID auto-saved: \" + responseData.assignmentConstraintId);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearer_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"budget\": 75000.00,\n  \"timelineDays\": 45,\n  \"workingDaysPerMonth\": 22\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/assignments/{{assignment_id}}/constraints",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "assignments",
+                "{{assignment_id}}",
+                "constraints"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Constraints",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearer_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/assignments/{{assignment_id}}/constraints",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "assignments",
+                "{{assignment_id}}",
+                "constraints"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Constraint",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearer_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"budget\": 80000.00,\n  \"timelineDays\": 50,\n  \"workingDaysPerMonth\": 22\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/assignments/{{assignment_id}}/constraints/{{constraint_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "assignments",
+                "{{assignment_id}}",
+                "constraints",
+                "{{constraint_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Constraint",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearer_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/assignments/{{assignment_id}}/constraints/{{constraint_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "assignments",
+                "{{assignment_id}}",
+                "constraints",
+                "{{constraint_id}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Business Rule Engine (Member 3)",
+      "item": [
+        {
+          "name": "Feature 1 - Skill Matching",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearer_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/assignments/{{assignment_id}}/skill-matching",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "assignments",
+                "{{assignment_id}}",
+                "skill-matching"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Feature 2 - Eligible Resource Identification",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearer_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/assignments/{{assignment_id}}/eligible-resources",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "assignments",
+                "{{assignment_id}}",
+                "eligible-resources"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Feature 3 - Matrix Input Preparation",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearer_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/assignments/{{assignment_id}}/matrix-input",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "assignments",
+                "{{assignment_id}}",
+                "matrix-input"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Matrix Generation (Member 4)",
+      "item": [
+        {
+          "name": "Cost Matrix Preview",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearer_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{base_url}}/api/optimization/preview/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "optimization",
+                "preview",
+                "1"
+              ]
+            },
+            "description": "Generates the Cost Matrix Preview before running Cost Minimization.\nUses optimizationType = COST_MINIMIZATION.\nReturns assignment summary, eligible/ineligible resources, budget, timeline, and cost matrix."
+          },
+          "response": []
+        },
+        {
+          "name": "Profit Matrix Preview",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearer_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"assignmentId\": 1,\n  \"assignmentName\": \"AWS Kubernetes Migration Phase 1\",\n  \"assignmentType\": \"Software Development\",\n  \"optimizationType\": \"PROFIT_MAXIMIZATION\",\n  \"constraint\": {\n    \"budget\": 75000,\n    \"timelineDays\": 45,\n    \"workingDaysPerMonth\": 22\n  },\n  \"resources\": [\n    {\n      \"resourceId\": 1,\n      \"resourceName\": \"Aarav Sharma\",\n      \"role\": \"Cloud Architect\",\n      \"monthlySalary\": 90000,\n      \"performanceRating\": 88\n    },\n    {\n      \"resourceId\": 2,\n      \"resourceName\": \"Vihaan Patel\",\n      \"role\": \"DevOps Engineer\",\n      \"monthlySalary\": 75000,\n      \"performanceRating\": 82\n    }\n  ],\n  \"tasks\": [\n    {\n      \"taskId\": 1,\n      \"taskName\": \"Cluster Provisioning & Helm Setup\",\n      \"estimatedDays\": 10\n    },\n    {\n      \"taskId\": 2,\n      \"taskName\": \"CI/CD Pipeline Construction\",\n      \"estimatedDays\": 15\n    }\n  ],\n  \"eligibilityList\": [\n    {\n      \"resourceId\": 1,\n      \"taskId\": 1,\n      \"eligible\": true,\n      \"reason\": \"Skill match 100%\"\n    },\n    {\n      \"resourceId\": 1,\n      \"taskId\": 2,\n      \"eligible\": true,\n      \"reason\": \"Skill match 100%\"\n    },\n    {\n      \"resourceId\": 2,\n      \"taskId\": 1,\n      \"eligible\": true,\n      \"reason\": \"Skill match 100%\"\n    },\n    {\n      \"resourceId\": 2,\n      \"taskId\": 2,\n      \"eligible\": true,\n      \"reason\": \"Skill match 100%\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/optimization/preview",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "optimization",
+                "preview"
+              ]
+            },
+            "description": "Generates the Profit Matrix Preview before running Profit Maximization.\nUses optimizationType = PROFIT_MAXIMIZATION.\nReturns assignment summary, eligible/ineligible resources, budget, timeline, and profit preview matrix."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Assignment Optimization Engine (Member 4)",
+      "item": [
+        {
+          "name": "Cost Minimization",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearer_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{base_url}}/api/optimization/generate/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "optimization",
+                "generate",
+                "1"
+              ]
+            },
+            "description": "Executes Hungarian Algorithm using Cost Minimization.\nReturns optimized assignment, assignment cost, optimized matrix, budget status, timeline status and execution time."
+          },
+          "response": []
+        },
+        {
+          "name": "Profit Maximization",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearer_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{base_url}}/api/optimization/generate/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "optimization",
+                "generate",
+                "1"
+              ]
+            },
+            "description": "Executes Hungarian Algorithm using Profit Maximization.\nReturns optimized assignment, total saved money, optimized matrix, budget status, timeline status and execution time."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Assignment Result Management (Member 4)",
+      "item": [
+        {
+          "name": "Cost Optimization Result",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearer_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"assignmentId\": 1,\n  \"assignmentName\": \"AWS Kubernetes Migration Phase 1\",\n  \"assignmentType\": \"Software Development\",\n  \"optimizationType\": \"COST_MINIMIZATION\",\n  \"constraint\": {\n    \"budget\": 75000,\n    \"timelineDays\": 45,\n    \"workingDaysPerMonth\": 22\n  },\n  \"resources\": [\n    {\n      \"resourceId\": 1,\n      \"resourceName\": \"Aarav Sharma\",\n      \"role\": \"Cloud Architect\",\n      \"monthlySalary\": 90000,\n      \"performanceRating\": 88\n    },\n    {\n      \"resourceId\": 2,\n      \"resourceName\": \"Vihaan Patel\",\n      \"role\": \"DevOps Engineer\",\n      \"monthlySalary\": 75000,\n      \"performanceRating\": 82\n    }\n  ],\n  \"tasks\": [\n    {\n      \"taskId\": 1,\n      \"taskName\": \"Cluster Provisioning & Helm Setup\",\n      \"estimatedDays\": 10\n    },\n    {\n      \"taskId\": 2,\n      \"taskName\": \"CI/CD Pipeline Construction\",\n      \"estimatedDays\": 15\n    }\n  ],\n  \"eligibilityList\": [\n    {\n      \"resourceId\": 1,\n      \"taskId\": 1,\n      \"eligible\": true,\n      \"reason\": \"Skill match 100%\"\n    },\n    {\n      \"resourceId\": 1,\n      \"taskId\": 2,\n      \"eligible\": true,\n      \"reason\": \"Skill match 100%\"\n    },\n    {\n      \"resourceId\": 2,\n      \"taskId\": 1,\n      \"eligible\": true,\n      \"reason\": \"Skill match 100%\"\n    },\n    {\n      \"resourceId\": 2,\n      \"taskId\": 2,\n      \"eligible\": true,\n      \"reason\": \"Skill match 100%\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/optimization/generate/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "optimization",
+                "generate",
+                "1"
+              ]
+            },
+            "description": "Returns final Cost Optimization result including:\n\n• Assignment Summary\n• Optimized Assignment\n• Cost Matrix\n• Total Assignment Cost\n• Budget Status\n• Timeline Status\n• Execution Time"
+          },
+          "response": []
+        },
+        {
+          "name": "Profit Optimization Result",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{bearer_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"assignmentId\": 1,\n  \"assignmentName\": \"AWS Kubernetes Migration Phase 1\",\n  \"assignmentType\": \"Software Development\",\n  \"optimizationType\": \"PROFIT_MAXIMIZATION\",\n  \"constraint\": {\n    \"budget\": 75000,\n    \"timelineDays\": 45,\n    \"workingDaysPerMonth\": 22\n  },\n  \"resources\": [\n    {\n      \"resourceId\": 1,\n      \"resourceName\": \"Aarav Sharma\",\n      \"role\": \"Cloud Architect\",\n      \"monthlySalary\": 90000,\n      \"performanceRating\": 88\n    },\n    {\n      \"resourceId\": 2,\n      \"resourceName\": \"Vihaan Patel\",\n      \"role\": \"DevOps Engineer\",\n      \"monthlySalary\": 75000,\n      \"performanceRating\": 82\n    }\n  ],\n  \"tasks\": [\n    {\n      \"taskId\": 1,\n      \"taskName\": \"Cluster Provisioning & Helm Setup\",\n      \"estimatedDays\": 10\n    },\n    {\n      \"taskId\": 2,\n      \"taskName\": \"CI/CD Pipeline Construction\",\n      \"estimatedDays\": 15\n    }\n  ],\n  \"eligibilityList\": [\n    {\n      \"resourceId\": 1,\n      \"taskId\": 1,\n      \"eligible\": true,\n      \"reason\": \"Skill match 100%\"\n    },\n    {\n      \"resourceId\": 1,\n      \"taskId\": 2,\n      \"eligible\": true,\n      \"reason\": \"Skill match 100%\"\n    },\n    {\n      \"resourceId\": 2,\n      \"taskId\": 1,\n      \"eligible\": true,\n      \"reason\": \"Skill match 100%\"\n    },\n    {\n      \"resourceId\": 2,\n      \"taskId\": 2,\n      \"eligible\": true,\n      \"reason\": \"Skill match 100%\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/optimization/generate",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "optimization",
+                "generate"
+              ]
+            },
+            "description": "Returns final Profit Optimization result including:\n\n• Assignment Summary\n• Optimized Assignment\n• Profit Matrix\n• Total Assignment Cost\n• Total Saved Money\n• Budget Status\n• Timeline Status\n• Execution Time"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Add Resource",
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{bearer_token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"resourceIds\": [1,2,3,4]\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/assignments/1/resources",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "assignments",
+            "1",
+            "resources"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "bearer_token",
+      "value": ""
+    },
+    {
+      "key": "assignment_id",
+      "value": "1"
+    },
+    {
+      "key": "task_id",
+      "value": "1"
+    },
+    {
+      "key": "constraint_id",
+      "value": "1"
+    }
+  ]
+}

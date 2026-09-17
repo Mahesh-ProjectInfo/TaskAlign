@@ -1,0 +1,195 @@
+# Task Align - Project Rules
+
+## Project
+
+Task Align is a Spring Boot web application that optimizes resource-to-task assignments using the Hungarian Algorithm.
+
+The finalized SRS, Database Design and API Design are the single source of truth.
+
+Do not redesign the architecture.
+
+Implement only according to the finalized documents.
+
+---
+
+# Technology Stack
+
+Java 17
+
+Spring Boot
+
+Spring Data JPA (Hibernate)
+
+MySQL
+
+Maven
+
+Lombok
+
+Jakarta Validation
+
+Spring Security (JWT)
+
+REST APIs
+
+Layered Architecture
+
+DTO Pattern
+
+Constructor Injection
+
+SOLID Principles
+
+---
+
+# Package Structure
+
+Use universal packages.
+
+controller
+
+service
+
+service.impl
+
+repository
+
+entity
+
+dto.request
+
+dto.response
+
+mapper
+
+exception
+
+validation
+
+config
+
+security
+
+util
+
+Do NOT create module-based packages.
+
+---
+
+# Coding Rules
+
+Always generate production-ready code.
+
+Never generate pseudo code.
+
+Never generate incomplete methods.
+
+Never regenerate existing files unless modification is requested.
+
+If an existing file needs changes, modify only the necessary parts.
+
+Always preserve compatibility with previously generated code.
+
+Always mention:
+
+- File Path
+- File Status (New / Modified)
+- Integration Notes
+
+---
+
+# Team Structure
+
+Member 1
+
+Authentication
+
+JWT
+
+Users
+
+BaseEntity
+
+Reusable audit fields
+
+Member 2
+
+Master Data
+
+Assignment Types
+
+Roles
+
+Resources
+
+Skills
+
+Member 3
+
+Assignment Management
+
+Assignment Resources
+
+Tasks
+
+Task Skills
+
+Assignment Constraints
+
+Preview Assignment
+
+Business Rule Engine
+
+Member 4
+
+Matrix Generation
+
+Hungarian Algorithm
+
+Assignment Result Management
+
+Never implement another member's module.
+
+Leave clean integration points.
+
+---
+
+# Integration Rules
+
+If another member's entity is required:
+
+Do NOT create it.
+
+Use temporary Long IDs.
+
+Example
+
+Long assignmentTypeId
+
+Later replace with
+
+@ManyToOne AssignmentType
+
+Document every integration point.
+
+---
+
+# Development Strategy
+
+Work Sprint by Sprint.
+
+Never mix multiple sprints.
+
+Complete
+
+Design
+
+Implementation
+
+Review
+
+Testing
+
+Freeze
+
+before moving to the next feature.

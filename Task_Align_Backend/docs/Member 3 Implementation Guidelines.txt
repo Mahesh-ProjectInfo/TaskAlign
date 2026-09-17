@@ -1,0 +1,409 @@
+Task Align – Member 3 Implementation Guidelines (Master Prompt)
+Project Context
+
+You are implementing the Task Align Spring Boot project.
+
+This project has already completed the planning and documentation phase.
+
+The finalized SRS, Database Design, API Design, Business Workflow, and Architecture are the single source of truth.
+
+Do not redesign the architecture.
+
+Only implement features according to the finalized design.
+
+My Role
+
+I am Member 3 of a four-member development team.
+
+All members are developing in parallel.
+
+Only implement Member 3's modules.
+
+Never implement another member's module.
+
+If another member's implementation is required, leave a clean integration point and document it.
+
+Member Responsibilities
+Member 1
+
+Responsible for:
+
+Authentication
+User Management
+JWT Security
+BaseEntity (Auditing)
+
+Reusable components provided by Member 1:
+
+BaseEntity
+createdBy
+updatedBy
+createdAt
+updatedAt
+isDeleted
+
+Do not recreate these.
+
+All entities must extend Member 1's BaseEntity.
+
+Member 2
+
+Responsible for:
+
+Master Data
+
+Includes:
+
+Assignment Types
+Roles
+Skills
+Resources
+
+During development, use temporary IDs instead of relationships.
+
+Example:
+
+private Long assignmentTypeId;
+
+Later this will become
+
+@ManyToOne
+private AssignmentType assignmentType;
+
+Do not create Member 2 entities.
+
+Member 3 (Current Scope)
+
+Responsible for:
+
+Assignment Management
+Create Assignment
+View Assignment
+Update Assignment
+Delete Assignment
+Assignment Resources
+Tasks
+Task Skills
+Assignment Constraints
+Preview Assignment
+Business Rule Engine
+
+Stop after preparing Matrix Input.
+
+Member 4
+
+Responsible for:
+
+Matrix Generation
+Optimization Matrix
+Hungarian Algorithm
+Assignment Results
+
+Do not implement these.
+
+Current Development Strategy
+
+The project is implemented sprint-by-sprint.
+
+A sprint must be completed before moving to the next sprint.
+
+Never mix multiple sprints.
+
+Sprint Plan
+Sprint 1 – Assignment Management
+
+Database Table:
+
+Assignments
+
+Features
+
+Create Assignment
+View All Assignments
+View Assignment by ID
+Update Assignment
+Soft Delete Assignment
+
+Deliverables
+
+Assignment Entity
+Assignment DTOs
+Assignment Repository
+Assignment Service
+Assignment ServiceImpl
+Assignment Controller
+Validation
+Exception Handling
+Testing
+
+Freeze
+
+Sprint 2 – Assignment Resources
+
+Database Table:
+
+Assignment Resources
+
+Features
+
+Add Resources
+View Resources
+Update Resources
+Remove Resources
+
+Freeze
+
+Sprint 3 – Tasks
+
+Database Table:
+
+Tasks
+
+CRUD
+
+Freeze
+
+Sprint 4 – Task Skills
+
+Database Table:
+
+Task Skills
+
+CRUD
+
+Freeze
+
+Sprint 5 – Assignment Constraints
+
+Database Table:
+
+Assignment Constraints
+
+CRUD
+
+Freeze
+
+Sprint 6 – Preview Assignment
+
+Aggregate data only.
+
+Do not generate matrices.
+
+Freeze.
+
+Sprint 7 – Business Rule Engine
+
+Prepare Matrix Input.
+
+Includes
+
+Skill Matching
+Eligible Resources
+Matrix Input DTO
+
+Stop here.
+
+Do not implement:
+
+Matrix Generation
+Hungarian Algorithm
+Assignment Results
+
+Freeze.
+
+Sprint 8 – Integration
+
+Integrate Member 1
+
+Integrate Member 2
+
+Integrate Member 4
+
+Performance Review
+
+Testing
+
+Freeze.
+
+Current Progress
+
+We are currently in
+
+Sprint 1
+
+Feature Status
+
+✅ Create Assignment — Completed & Frozen
+
+Completed files:
+
+Assignment.java
+OptimizationType.java
+AssignmentStatus.java
+CreateAssignmentRequest.java
+AssignmentResponse.java
+AssignmentRepository.java
+AssignmentService.java
+AssignmentServiceImpl.java
+AssignmentController.java
+AssignmentMapper.java
+AssignmentNotFoundException.java
+DuplicateAssignmentException.java
+
+Completed:
+
+Validation
+Testing
+Code Review
+Feature Freeze
+
+Next feature:
+
+View All Assignments
+Coding Standards
+
+Use:
+
+Java 17
+Spring Boot
+Spring Data JPA
+Hibernate
+MySQL
+Maven
+Lombok
+Jakarta Validation
+REST APIs
+DTO Architecture
+Layered Architecture
+Constructor Injection
+SOLID Principles
+Package Structure
+
+Use the existing project structure.
+
+Do not create module-based packages.
+
+Use universal packages.
+
+Example:
+
+controller
+entity
+repository
+service
+service.impl
+dto.request
+dto.response
+mapper
+exception
+validation
+config
+util
+Output Format
+
+Whenever implementing a feature, provide code in four parts.
+
+Part 1
+
+Entity
+
+Enums
+
+DTOs
+
+Part 2
+
+Repository
+
+Service
+
+ServiceImpl
+
+Part 3
+
+Controller
+
+Mapper
+
+Exceptions
+
+Validation
+
+Part 4
+
+Testing
+
+Postman
+
+Code Review
+
+Feature Freeze
+
+File Requirements
+
+Every file must include:
+
+Exact file path
+New/Modified status
+Complete production-ready code
+
+Never provide snippets.
+
+Integration Rules
+
+Whenever another member's code is required:
+
+Do not implement it.
+
+Instead:
+
+Leave a clean integration point.
+Add an Integration Note.
+
+Example:
+
+Integration Note
+
+Replace Long assignmentTypeId with
+
+@ManyToOne
+private AssignmentType assignmentType;
+
+after Member 2 completes the Assignment Type module.
+Dummy Data
+
+Until Member 2 finishes Master Data, assume dummy data exists.
+
+Use:
+
+1 Assignment
+5 Resources
+4 Tasks
+8 Skills
+1 Assignment Constraint
+
+Design the code so that dummy data can later be replaced by real APIs without major changes.
+
+Development Workflow
+
+For every feature:
+
+Quick Design Review
+Complete Implementation
+Code Review
+Testing
+Freeze
+
+Once frozen, do not modify the feature unless a bug or change request is introduced.
+
+One Recommendation
+
+I suggest making one small improvement to this prompt before using it with Codex.
+
+Instead of saying:
+
+"Provide complete production-ready code."
+
+add this:
+
+"If a file already exists, modify the existing file instead of regenerating it. Only create new files when necessary. Preserve existing project structure and avoid duplicate classes."

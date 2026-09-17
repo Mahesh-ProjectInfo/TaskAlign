@@ -1,0 +1,459 @@
+﻿--- TABLE START ---
+Column Name | Data Type | Constraints | Description
+user_id | BIGINT | Primary Key, Auto Increment | Unique identifier for each user.
+full_name | VARCHAR(100) | NOT NULL | Stores the full name of the Assignment Manager.
+email | VARCHAR(100) | UNIQUE, NOT NULL | Stores the email address used for Email Login and Forgot Password.
+mobile_number | VARCHAR(15) | UNIQUE, NOT NULL | Stores the mobile number used for Mobile Login.
+password | VARCHAR(255) | NOT NULL | Stores the BCrypt encrypted password.
+profile_picture | VARCHAR(255) | NULL | Stores the uploaded profile picture path.
+is_deleted | BOOLEAN | DEFAULT FALSE | Indicates whether the user has been soft deleted.
+created_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Stores the date and time when the record was created.
+updated_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP | Stores the last modification date and time.
+--- TABLE END ---
+--- TABLE START ---
+Column
+user_id
+--- TABLE END ---
+--- TABLE START ---
+Parent Table | Child Table | Relationship
+users | assignments | One-to-Many
+--- TABLE END ---
+--- TABLE START ---
+Form | Purpose
+Register | Creates a new user account.
+Login | Authenticates the user.
+Forgot Password | Finds the user by email before OTP verification.
+Edit Profile | Updates user profile information.
+Change Password | Updates the encrypted password.
+--- TABLE END ---
+--- TABLE START ---
+user_id | full_name | email | mobile_number | password | profile_picture | is_deleted
+1 | Mahesh Kumar | mahesh@gmail.com | 9876543210 | $2a$10$AbCdEf... | mahesh.jpg | FALSE
+2 | Rahul Sharma | rahul@gmail.com | 9123456780 | $2a$10$XyZaBc... | rahul.jpg | FALSE
+--- TABLE END ---
+--- TABLE START ---
+Column Name | Data Type | Constraints | Description
+assignment_type_id | BIGINT | Primary Key, Auto Increment | Unique identifier for each assignment type.
+assignment_type_name | VARCHAR(100) | UNIQUE, NOT NULL | Stores the name of the assignment type (e.g., Software Project Assignment).
+created_by | BIGINT | Foreign Key, NOT NULL | References the user who created the assignment type.
+updated_by | BIGINT | Foreign Key | References the user who last updated the assignment type.
+created_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Stores the record creation timestamp.
+updated_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP | Stores the last modification timestamp.
+is_deleted | BOOLEAN | DEFAULT FALSE | Indicates whether the assignment type has been soft deleted.
+--- TABLE END ---
+--- TABLE START ---
+Column
+assignment_type_id
+--- TABLE END ---
+--- TABLE START ---
+Column | References
+created_by | users.user_id
+updated_by | users.user_id
+--- TABLE END ---
+--- TABLE START ---
+Parent Table | Child Table | Relationship
+assignment_types | roles | One-to-Many
+assignment_types | skills | One-to-Many
+assignment_types | resources | One-to-Many
+assignment_types | assignments | One-to-Many
+users | assignment_types (created_by) | One-to-Many
+users | assignment_types (updated_by) | One-to-Many
+--- TABLE END ---
+--- TABLE START ---
+Form | Purpose
+Assignment Type Master | Create, update, and manage Assignment Types.
+Role Master | Loads Assignment Types to categorize roles.
+Skill Master | Loads Assignment Types to categorize skills.
+Resource Management | Loads Assignment Types to categorize resources.
+Create Assignment â€“ Assignment Details | Allows the Assignment Manager to select an Assignment Type.
+--- TABLE END ---
+--- TABLE START ---
+assignment_type_id | assignment_type_name | created_by | updated_by | is_deleted
+1 | Software Project Assignment | 1 | 1 | FALSE
+2 | Manufacturing Job Assignment | 1 | 2 | FALSE
+3 | Construction Project Assignment | 1 | 1 | FALSE
+4 | Sales Region Assignment | 2 | 2 | FALSE
+--- TABLE END ---
+--- TABLE START ---
+Column Name | Data Type | Constraints | Description
+role_id | BIGINT | Primary Key, Auto Increment | Unique identifier for each role.
+assignment_type_id | BIGINT | Foreign Key, NOT NULL | References the Assignment Type to which the role belongs.
+role_name | VARCHAR(100) | NOT NULL | Stores the name of the role.
+created_by | BIGINT | Foreign Key, NOT NULL | References the Assignment Manager who created the role.
+updated_by | BIGINT | Foreign Key | References the Assignment Manager who last updated the role.
+created_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Stores the record creation timestamp.
+updated_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP | Stores the last modification timestamp.
+is_deleted | BOOLEAN | DEFAULT FALSE | Indicates whether the role has been soft deleted.
+--- TABLE END ---
+--- TABLE START ---
+Column
+role_id
+--- TABLE END ---
+--- TABLE START ---
+Column | References | Relationship
+assignment_type_id | assignment_types.assignment_type_id | Many-to-One
+created_by | users.user_id | Many-to-One
+updated_by | users.user_id | Many-to-One
+--- TABLE END ---
+--- TABLE START ---
+Parent Table | Child Table | Relationship
+assignment_types | roles | One-to-Many
+roles | resources | One-to-Many
+users | roles (created_by) | One-to-Many
+users | roles (updated_by) | One-to-Many
+--- TABLE END ---
+--- TABLE START ---
+Form | Purpose
+Role Master | Create, Update, View, and Delete Roles.
+Resource Management | Loads Roles based on the selected Assignment Type.
+Create Assignment â€“ Select Resources | Displays the assigned Role for each Resource.
+Assignment Results Screen | Displays the assigned Resource's Role.
+--- TABLE END ---
+--- TABLE START ---
+role_id | assignment_type_id | role_name | created_by | updated_by | created_at | updated_at | is_deleted
+1 | 1 | Project Manager | 1 | 1 | 2026-07-20 09:00:00 | 2026-07-20 09:00:00 | FALSE
+2 | 1 | Backend Developer | 1 | 1 | 2026-07-20 09:10:00 | 2026-07-20 09:10:00 | FALSE
+3 | 1 | Frontend Developer | 1 | 2 | 2026-07-20 09:20:00 | 2026-07-22 11:30:00 | FALSE
+4 | 2 | Machine Operator | 2 | 2 | 2026-07-20 10:00:00 | 2026-07-20 10:00:00 | FALSE
+5 | 3 | Civil Engineer | 1 | 1 | 2026-07-20 10:30:00 | 2026-07-20 10:30:00 | FALSE
+6 | 4 | Sales Executive | 2 | 2 | 2026-07-20 11:00:00 | 2026-07-20 11:00:00 | FALSE
+--- TABLE END ---
+--- TABLE START ---
+Column Name | Data Type | Constraints | Description
+skill_id | BIGINT | Primary Key, Auto Increment | Unique identifier for each skill.
+assignment_type_id | BIGINT | Foreign Key, NOT NULL | References the Assignment Type to which the skill belongs.
+skill_name | VARCHAR(100) | NOT NULL | Stores the name of the skill.
+created_by | BIGINT | Foreign Key, NOT NULL | References the Assignment Manager who created the skill.
+updated_by | BIGINT | Foreign Key | References the Assignment Manager who last updated the skill.
+created_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Stores the record creation timestamp.
+updated_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP | Stores the last modification timestamp.
+is_deleted | BOOLEAN | DEFAULT FALSE | Indicates whether the skill has been soft deleted.
+--- TABLE END ---
+--- TABLE START ---
+Column
+skill_id
+--- TABLE END ---
+--- TABLE START ---
+Column | References | Relationship
+assignment_type_id | assignment_types.assignment_type_id | Many-to-One
+created_by | users.user_id | Many-to-One
+updated_by | users.user_id | Many-to-One
+--- TABLE END ---
+--- TABLE START ---
+Parent Table | Child Table | Relationship
+assignment_types | skills | One-to-Many
+skills | resource_skills | One-to-Many
+skills | task_skills | One-to-Many
+users | skills (created_by) | One-to-Many
+users | skills (updated_by) | One-to-Many
+--- TABLE END ---
+--- TABLE START ---
+Form | Purpose
+Skill Master | Create, Update, View, and Delete Skills.
+Resource Management | Select Skills for each Resource.
+Create Assignment â€“ Task Management | Select Required Skills for Tasks.
+Preview Assignment | Displays the selected Tasks and their required Skills before assignment generation. |  | Displays the selected Tasks and their required Skills before assignment generation.
+
+Displays the selected Tasks and their required Skills before assignment generation.
+--- TABLE END ---
+--- TABLE START ---
+
+--- TABLE END ---
+--- TABLE START ---
+Displays the selected Tasks and their required Skills before assignment generation.
+--- TABLE END ---
+--- TABLE START ---
+skill_id | assignment_type_id | skill_name | created_by | updated_by | created_at | updated_at | is_deleted
+1 | 1 | Java | 1 | 1 | 2026-07-20 09:00:00 | 2026-07-20 09:00:00 | FALSE
+2 | 1 | Spring Boot | 1 | 1 | 2026-07-20 09:10:00 | 2026-07-20 09:10:00 | FALSE
+3 | 1 | React | 1 | 2 | 2026-07-20 09:20:00 | 2026-07-22 11:30:00 | FALSE
+4 | 2 | Machine Operation | 2 | 2 | 2026-07-20 10:00:00 | 2026-07-20 10:00:00 | FALSE
+5 | 3 | Brick Work | 1 | 1 | 2026-07-20 10:30:00 | 2026-07-20 10:30:00 | FALSE
+6 | 4 | Negotiation | 2 | 2 | 2026-07-20 11:00:00 | 2026-07-20 11:00:00 | FALSE
+--- TABLE END ---
+--- TABLE START ---
+Column Name | Data Type | Constraints | Description
+resource_id | BIGINT | Primary Key, Auto Increment | Unique identifier for each resource.
+assignment_type_id | BIGINT | Foreign Key, NOT NULL | References the Assignment Type to which the resource belongs.
+role_id | BIGINT | Foreign Key, NOT NULL | References the Role assigned to the resource.
+resource_name | VARCHAR(100) | NOT NULL | Stores the resource's full name.
+monthly_salary | DECIMAL(12,2) | NOT NULL | Stores the monthly salary of the resource.
+performance_rating | DECIMAL(5,2) | NOT NULL | Stores the performance rating of the resource.
+created_by | BIGINT | Foreign Key, NOT NULL | References the Assignment Manager who created the resource.
+updated_by | BIGINT | Foreign Key | References the Assignment Manager who last updated the resource.
+created_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Stores the record creation timestamp.
+updated_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP | Stores the last modification timestamp.
+is_deleted | BOOLEAN | DEFAULT FALSE | Indicates whether the resource has been soft deleted.
+--- TABLE END ---
+--- TABLE START ---
+Column
+resource_id
+--- TABLE END ---
+--- TABLE START ---
+Column | References | Relationship
+assignment_type_id | assignment_types.assignment_type_id | Many-to-One
+role_id | roles.role_id | Many-to-One
+created_by | users.user_id | Many-to-One
+updated_by | users.user_id | Many-to-One
+--- TABLE END ---
+--- TABLE START ---
+Parent Table | Child Table | Relationship
+assignment_types | resources | One-to-Many
+roles | resources | One-to-Many
+resources | resource_skills | One-to-Many
+users | resources (created_by) | One-to-Many
+users | resources (updated_by) | One-to-Many
+--- TABLE END ---
+--- TABLE START ---
+Form | Purpose
+Resource Management | Create, Update, View, Delete, and Bulk Upload Resources.
+Create Assignment â€“ Select Resources | Load reusable Resources.
+Preview Assignment | Display selected Resources.
+Assignment Results Screen | Display assigned Resources.
+--- TABLE END ---
+--- TABLE START ---
+resource_id | assignment_type_id | role_id | resource_name | monthly_salary | performance_rating | created_by | updated_by | is_deleted
+1 | 1 | 2 | Aarav Sharma | 90000.00 | 88.00 | 1 | 1 | FALSE
+2 | 1 | 3 | Priya Verma | 82000.00 | 91.00 | 1 | 2 | FALSE
+3 | 2 | 4 | Ravi Kumar | 45000.00 | 78.00 | 2 | 2 | FALSE
+4 | 4 | 6 | Neha Iyer | 72000.00 | 84.00 | 2 | 2 | FALSE
+--- TABLE END ---
+--- TABLE START ---
+Resource | Skill
+Aarav Sharma | Java
+Aarav Sharma | Spring Boot
+Aarav Sharma | REST API
+--- TABLE END ---
+--- TABLE START ---
+Column Name | Data Type | Constraints | Description
+resource_skill_id | BIGINT | Primary Key, Auto Increment | Unique identifier for each Resource-Skill mapping.
+resource_id | BIGINT | Foreign Key, NOT NULL | References the Resource.
+skill_id | BIGINT | Foreign Key, NOT NULL | References the Skill assigned to the Resource.
+--- TABLE END ---
+--- TABLE START ---
+Column
+resource_skill_id
+--- TABLE END ---
+--- TABLE START ---
+Column | References | Relationship
+resource_id | resources.resource_id | Many-to-One
+skill_id | skills.skill_id | Many-to-One
+--- TABLE END ---
+--- TABLE START ---
+Parent Table | Child Table | Relationship
+resources | resource_skills | One-to-Many
+skills | resource_skills | One-to-Many
+--- TABLE END ---
+--- TABLE START ---
+Form | Purpose
+Resource Management | Stores the selected Skills for each Resource.
+Create Assignment â€“ Select Resources | Displays the Skills associated with each Resource.
+Preview Assignment | Business Rule Engine compares Resource Skills with Task Required Skills.
+--- TABLE END ---
+--- TABLE START ---
+resource_skill_id | resource_id | skill_id
+1 | 1 | 1 (Java)
+2 | 1 | 2 (Spring Boot)
+3 | 1 | 5 (REST API)
+4 | 2 | 3 (React)
+5 | 2 | 5 (REST API)
+6 | 3 | 6 (Machine Operation)
+7 | 4 | 9 (Negotiation)
+8 | 4 | 10 (Product Knowledge)
+--- TABLE END ---
+--- TABLE START ---
+Column Name | Data Type | Constraints | Description
+assignment_id | BIGINT | Primary Key, Auto Increment | Unique identifier for each assignment.
+assignment_type_id | BIGINT | Foreign Key, NOT NULL | References the selected Assignment Type.
+assignment_name | VARCHAR(150) | NOT NULL | Stores the name of the assignment.
+assignment_description | TEXT | NULL | Stores the assignment description.
+optimization_type | ENUM('COST_MINIMIZATION','PROFIT_MAXIMIZATION') | NOT NULL | Stores the selected optimization objective.
+assignment_status | ENUM('DRAFT','COMPLETED') | DEFAULT 'DRAFT' | Stores the current assignment status.
+created_by | BIGINT | Foreign Key, NOT NULL | References the Assignment Manager who created the assignment.
+updated_by | BIGINT | Foreign Key | References the Assignment Manager who last modified the assignment.
+created_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Stores the record creation timestamp.
+updated_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP | Stores the last modification timestamp.
+is_deleted | BOOLEAN | DEFAULT FALSE | Indicates whether the assignment has been soft deleted.
+--- TABLE END ---
+--- TABLE START ---
+Column
+assignment_id
+--- TABLE END ---
+--- TABLE START ---
+Column | References | Relationship
+assignment_type_id | assignment_types.assignment_type_id | Many-to-One
+created_by | users.user_id | Many-to-One
+updated_by | users.user_id | Many-to-One
+--- TABLE END ---
+--- TABLE START ---
+Parent Table | Child Table | Relationship
+assignment_types | assignments | One-to-Many
+users | assignments (created_by) | One-to-Many
+users | assignments (updated_by) | One-to-Many
+assignments | assignment_resources | One-to-Many
+assignments | tasks | One-to-Many
+assignments | assignment_constraints | One-to-One
+--- TABLE END ---
+--- TABLE START ---
+Form | Purpose
+Create Assignment | Stores Assignment Details.
+Preview Assignment | Displays Assignment information before generation.
+Assignment Results Screen | Displays finalized Assignment details.
+Dashboard | Displays Assignment statistics and status.
+--- TABLE END ---
+--- TABLE START ---
+assignment_id | assignment_type_id | assignment_name | optimization_type | assignment_status | created_by | updated_by | is_deleted
+1 | 1 | E-Commerce Website Development | COST_MINIMIZATION | COMPLETED | 1 | 1 | FALSE
+2 | 2 | Mobile Assembly Line | PROFIT_MAXIMIZATION | DRAFT | 2 | 2 | FALSE
+3 | 3 | Residential Building Project | COST_MINIMIZATION | COMPLETED | 1 | 2 | FALSE
+--- TABLE END ---
+--- TABLE START ---
+Assignment | Resource
+E-Commerce Website Development | Aarav Sharma
+E-Commerce Website Development | Priya Verma
+E-Commerce Website Development | Rahul Verma
+--- TABLE END ---
+--- TABLE START ---
+Column Name | Data Type | Constraints | Description
+assignment_resource_id | BIGINT | Primary Key, Auto Increment | Unique identifier for each Assignment-Resource mapping.
+assignment_id | BIGINT | Foreign Key, NOT NULL | References the Assignment.
+resource_id | BIGINT | Foreign Key, NOT NULL | References the selected Resource.
+--- TABLE END ---
+--- TABLE START ---
+Column
+assignment_resource_id
+--- TABLE END ---
+--- TABLE START ---
+Column | References | Relationship
+assignment_id | assignments.assignment_id | Many-to-One
+resource_id | resources.resource_id | Many-to-One
+--- TABLE END ---
+--- TABLE START ---
+Parent Table | Child Table | Relationship
+assignments | assignment_resources | One-to-Many
+resources | assignment_resources | One-to-Many
+--- TABLE END ---
+--- TABLE START ---
+Form | Purpose
+Create Assignment â€“ Select Resources | Stores the selected Resources for an Assignment.
+Preview Assignment | Displays the selected Resources before generation.
+Assignment Results Screen | Retrieves the Resources participating in the Assignment.
+--- TABLE END ---
+--- TABLE START ---
+assignment_resource_id | assignment_id | resource_id
+1 | 1 | 1 (Aarav Sharma)
+2 | 1 | 2 (Priya Verma)
+3 | 1 | 3 (Rahul Verma)
+4 | 2 | 2 (Priya Verma)
+5 | 2 | 4 (Neha Iyer)
+--- TABLE END ---
+--- TABLE START ---
+Column Name | Data Type | Constraints | Description
+task_id | BIGINT | Primary Key, Auto Increment | Unique identifier for each task.
+assignment_id | BIGINT | Foreign Key, NOT NULL | References the Assignment to which the task belongs.
+task_name | VARCHAR(150) | NOT NULL | Stores the name of the task.
+estimated_days | INT | NOT NULL | Stores the estimated number of days required to complete the task.
+created_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Stores the record creation timestamp.
+updated_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP | Stores the last modification timestamp.
+--- TABLE END ---
+--- TABLE START ---
+Column
+task_id
+--- TABLE END ---
+--- TABLE START ---
+Column | References | Relationship
+assignment_id | assignments.assignment_id | Many-to-One
+--- TABLE END ---
+--- TABLE START ---
+Parent Table | Child Table | Relationship
+assignments | tasks | One-to-Many
+tasks | task_skills | One-to-Many
+--- TABLE END ---
+--- TABLE START ---
+Form | Purpose
+Create Assignment â€“ Task Management | Create, Update, and Delete Tasks.
+Preview Assignment | Displays all Tasks before assignment generation.
+Assignment Results Screen | Displays the final Resource allocated to each Task.
+--- TABLE END ---
+--- TABLE START ---
+task_id | assignment_id | task_name | estimated_days | created_at | updated_at
+1 | 1 | Develop Login Module | 5 | 2026-07-20 09:00:00 | 2026-07-20 09:00:00
+2 | 1 | Develop Dashboard | 4 | 2026-07-20 09:10:00 | 2026-07-20 09:10:00
+3 | 1 | Payment Integration | 6 | 2026-07-20 09:20:00 | 2026-07-20 09:20:00
+4 | 1 | Testing | 3 | 2026-07-20 09:30:00 | 2026-07-20 09:30:00
+--- TABLE END ---
+--- TABLE START ---
+Task | Skill
+Develop Login Module | Java
+Develop Login Module | Spring Boot
+Develop Login Module | MySQL
+--- TABLE END ---
+--- TABLE START ---
+Column Name | Data Type | Constraints | Description
+task_skill_id | BIGINT | Primary Key, Auto Increment | Unique identifier for each Task-Skill mapping.
+task_id | BIGINT | Foreign Key, NOT NULL | References the Task.
+skill_id | BIGINT | Foreign Key, NOT NULL | References the required Skill for the Task.
+--- TABLE END ---
+--- TABLE START ---
+Column
+task_skill_id
+--- TABLE END ---
+--- TABLE START ---
+Column | References | Relationship
+task_id | tasks.task_id | Many-to-One
+skill_id | skills.skill_id | Many-to-One
+--- TABLE END ---
+--- TABLE START ---
+Parent Table | Child Table | Relationship
+tasks | task_skills | One-to-Many
+skills | task_skills | One-to-Many
+--- TABLE END ---
+--- TABLE START ---
+Form | Purpose
+Create Assignment â€“ Task Management | Stores the required Skills for each Task.
+Preview Assignment | Displays the required Skills of every Task.
+Assignment Generation | Business Rule Engine compares Task Skills with Resource Skills before optimization.
+--- TABLE END ---
+--- TABLE START ---
+task_skill_id | task_id | skill_id
+1 | 1 | 1 (Java)
+2 | 1 | 2 (Spring Boot)
+3 | 1 | 4 (MySQL)
+4 | 2 | 3 (React)
+5 | 2 | 5 (REST API)
+6 | 3 | 1 (Java)
+7 | 3 | 5 (REST API)
+8 | 4 | 6 (Testing)
+--- TABLE END ---
+--- TABLE START ---
+Column Name | Data Type | Constraints | Description
+assignment_constraint_id | BIGINT | Primary Key, Auto Increment | Unique identifier for each Assignment Constraint.
+assignment_id | BIGINT | Foreign Key, UNIQUE, NOT NULL | References the Assignment.
+budget | DECIMAL(12,2) | NOT NULL | Stores the maximum budget allocated for the Assignment.
+timeline_days | INT | NOT NULL | Stores the maximum number of days allowed to complete the Assignment.
+working_days_per_month | INT | NOT NULL | Stores the number of working days considered for salary-to-cost calculations.
+--- TABLE END ---
+--- TABLE START ---
+Column
+assignment_constraint_id
+--- TABLE END ---
+--- TABLE START ---
+Column | References | Relationship
+assignment_id | assignments.assignment_id | One-to-One
+--- TABLE END ---
+--- TABLE START ---
+Parent Table | Child Table | Relationship
+assignments | assignment_constraints | One-to-One
+--- TABLE END ---
+--- TABLE START ---
+Form | Purpose
+Create Assignment â€“ Assignment Constraints | Stores Budget, Timeline, and Working Days Per Month.
+Preview Assignment | Displays the defined Constraints before generation.
+Assignment Results Screen | Compares the generated Assignment against the defined Constraints.
+--- TABLE END ---
+--- TABLE START ---
+assignment_constraint_id | assignment_id | budget | timeline_days | working_days_per_month
+1 | 1 | 500000.00 | 45 | 22
+2 | 2 | 750000.00 | 60 | 24
+3 | 3 | 1200000.00 | 90 | 26
+--- TABLE END ---

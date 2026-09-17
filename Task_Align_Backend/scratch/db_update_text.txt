@@ -1,0 +1,278 @@
+﻿Table 1: users
+Table Structure
+Column Name
+Data Type
+Constraints
+Description
+user_id
+BIGINT
+Primary Key, Auto Increment
+Unique identifier for each user.
+full_name
+VARCHAR(100)
+NOT NULL
+Stores the full name of the Assignment Manager.
+email
+VARCHAR(100)
+UNIQUE, NOT NULL
+Stores the email address used for Email Login and Forgot Password.
+mobile_number
+VARCHAR(15)
+UNIQUE, NOT NULL
+Stores the mobile number used for Mobile Login.
+password
+VARCHAR(255)
+NOT NULL
+Stores the BCrypt encrypted password.
+profile_picture
+VARCHAR(255)
+NULL
+Stores the uploaded profile picture path.
+is_deleted
+BOOLEAN
+DEFAULT FALSE
+Indicates whether the user has been soft deleted.
+created_at
+TIMESTAMP
+DEFAULT CURRENT_TIMESTAMP
+Stores the date and time when the record was created.
+updated_at
+TIMESTAMP
+DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+Stores the last modification date and time.
+
+
+Table 2: roles (Role.java)
+Table Structure
+Column Name
+Data Type
+Constraints
+Description
+role_id
+BIGINT
+Primary Key, Auto Increment
+Unique identifier for each role.
+assignment_type_id
+BIGINT
+Foreign Key, NOT NULL
+References the Assignment Type to which the role belongs.
+role_name
+VARCHAR(100)
+NOT NULL
+Stores the name of the role.
+created_by
+BIGINT
+Foreign Key, NOT NULL
+References the Assignment Manager who created the role.
+updated_by
+BIGINT
+Foreign Key
+References the Assignment Manager who last updated the role.
+created_at
+TIMESTAMP
+DEFAULT CURRENT_TIMESTAMP
+Stores the record creation timestamp.
+updated_at
+TIMESTAMP
+DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+Stores the last modification timestamp.
+is_deleted
+BOOLEAN
+DEFAULT FALSE
+Indicates whether the role has been soft deleted.
+Table 4: Skills
+Table Structure
+Column Name
+Data Type
+Constraints
+Description
+skill_id
+BIGINT
+Primary Key, Auto Increment
+Unique identifier for each skill.
+assignment_type_id
+BIGINT
+Foreign Key, NOT NULL
+References the Assignment Type to which the skill belongs.
+skill_name
+VARCHAR(100)
+NOT NULL
+Stores the name of the skill.
+created_by
+BIGINT
+Foreign Key, NOT NULL
+References the Assignment Manager who created the skill.
+updated_by
+BIGINT
+Foreign Key
+References the Assignment Manager who last updated the skill.
+created_at
+TIMESTAMP
+DEFAULT CURRENT_TIMESTAMP
+Stores the record creation timestamp.
+updated_at
+TIMESTAMP
+DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+Stores the last modification timestamp.
+is_deleted
+BOOLEAN
+DEFAULT FALSE
+Indicates whether the skill has been soft deleted.
+6. Foreign Keys
+Column
+References
+Relationship
+assignment_type_id
+assignment_types.assignment_type_id
+Many-to-One
+created_by
+users.user_id
+Many-to-One
+updated_by
+users.user_id
+Many-to-One
+
+7. Database Relationships
+Parent Table
+Child Table
+Relationship
+assignment_types
+skills
+One-to-Many
+skills
+resource_skills
+One-to-Many
+skills
+task_skills
+One-to-Many
+users
+skills (created_by)
+One-to-Many
+users
+skills (updated_by)
+One-to-Many
+Table 5: Resources
+3. Table Structure
+Column Name
+Data Type
+Constraints
+Description
+resource_id
+BIGINT
+Primary Key, Auto Increment
+Unique identifier for each resource.
+assignment_type_id
+BIGINT
+Foreign Key, NOT NULL
+References the Assignment Type to which the resource belongs.
+role_id
+BIGINT
+Foreign Key, NOT NULL
+References the Role assigned to the resource.
+resource_name
+VARCHAR(100)
+NOT NULL
+Stores the resource's full name.
+monthly_salary
+DECIMAL(12,2)
+NOT NULL
+Stores the monthly salary of the resource.
+performance_rating
+DECIMAL(5,2)
+NOT NULL
+Stores the performance rating of the resource.
+created_by
+BIGINT
+Foreign Key, NOT NULL
+References the Assignment Manager who created the resource.
+updated_by
+BIGINT
+Foreign Key
+References the Assignment Manager who last updated the resource.
+created_at
+TIMESTAMP
+DEFAULT CURRENT_TIMESTAMP
+Stores the record creation timestamp.
+updated_at
+TIMESTAMP
+DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+Stores the last modification timestamp.
+is_deleted
+BOOLEAN
+DEFAULT FALSE
+Indicates whether the resource has been soft deleted.
+6. Foreign Keys
+Column
+References
+Relationship
+assignment_type_id
+assignment_types.assignment_type_id
+Many-to-One
+role_id
+roles.role_id
+Many-to-One
+created_by
+users.user_id
+Many-to-One
+updated_by
+users.user_id
+Many-to-One
+
+7. Database Relationships
+Parent Table
+Child Table
+Relationship
+assignment_types
+resources
+One-to-Many
+roles
+resources
+One-to-Many
+resources
+resource_skills
+One-to-Many
+users
+resources (created_by)
+One-to-Many
+users
+resources (updated_by)
+One-to-Many
+Table 6: Resource Skills
+3. Table Structure
+Column Name
+Data Type
+Constraints
+Description
+resource_skill_id
+BIGINT
+Primary Key, Auto Increment
+Unique identifier for each Resource-Skill mapping.
+resource_id
+BIGINT
+Foreign Key, NOT NULL
+References the Resource.
+skill_id
+BIGINT
+Foreign Key, NOT NULL
+References the Skill assigned to the Resource.
+6. Foreign Keys
+Column
+References
+Relationship
+resource_id
+resources.resource_id
+Many-to-One
+skill_id
+skills.skill_id
+Many-to-One
+
+7. Database Relationships
+Parent Table
+Child Table
+Relationship
+resources
+resource_skills
+One-to-Many
+skills
+resource_skills
+One-to-Many
