@@ -18,7 +18,7 @@ public class CorsConfig {
 
         // Frontend URL
         configuration.setAllowedOrigins(Arrays.asList(
-                "http://localhost:5173"
+                "https://task-align.vercel.app"
         ));
 
         // HTTP Methods
