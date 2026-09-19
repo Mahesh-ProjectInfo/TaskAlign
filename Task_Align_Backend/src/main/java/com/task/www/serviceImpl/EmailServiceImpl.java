@@ -1,13 +1,18 @@
 package com.task.www.serviceImpl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.task.www.service.EmailService;
 
 @Service
 public class EmailServiceImpl implements EmailService {
+
+    private static final Logger log = LoggerFactory.getLogger(EmailServiceImpl.class);
 
     private final JavaMailSender mailSender;
 
@@ -48,26 +53,34 @@ public class EmailServiceImpl implements EmailService {
         mailSender.send(message);
     }
 
+    @Async("emailTaskExecutor")
     @Override
     public void sendRegistrationSuccessMail(
             String toEmail,
             String fullName) {
 
-        SimpleMailMessage message = new SimpleMailMessage();
+        log.info("Sending registration welcome email asynchronously to: {}", toEmail);
 
-        message.setTo(toEmail);
-        message.setSubject("Welcome to Task Align");
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
 
-        message.setText(
-                "Dear " + fullName + ",\n\n"
-                + "Congratulations! Your Task Align account "
-                + "has been created successfully.\n\n"
-                + "You can now log in and start using the application.\n\n"
-                + "Regards,\n"
-                + "Task Align Team"
-        );
+            message.setTo(toEmail);
+            message.setSubject("Welcome to Task Align");
 
-        mailSender.send(message);
+            message.setText(
+                    "Dear " + fullName + ",\n\n"
+                    + "Congratulations! Your Task Align account "
+                    + "has been created successfully.\n\n"
+                    + "You can now log in and start using the application.\n\n"
+                    + "Regards,\n"
+                    + "Task Align Team"
+            );
+
+            mailSender.send(message);
+            log.info("Registration welcome email sent successfully to: {}", toEmail);
+        } catch (Exception e) {
+            log.error("Failed to send registration welcome email asynchronously to {}: {}", toEmail, e.getMessage(), e);
+        }
     }
 
     @Override

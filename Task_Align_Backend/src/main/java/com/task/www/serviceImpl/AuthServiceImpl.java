@@ -41,6 +41,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
 
 import lombok.RequiredArgsConstructor;
@@ -48,6 +50,8 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
+
+        private static final Logger log = LoggerFactory.getLogger(AuthServiceImpl.class);
 
         private final UserRepository userRepository;
         private final PasswordEncoder passwordEncoder;
@@ -87,6 +91,8 @@ public class AuthServiceImpl implements AuthService {
                 user.setCountry(request.getCountry());
 
                 User savedUser = userRepository.save(user);
+
+                log.info("Registration successful for user: {}; welcome email queued.", user.getEmail());
 
                 emailService.sendRegistrationSuccessMail(
                                 user.getEmail(),
