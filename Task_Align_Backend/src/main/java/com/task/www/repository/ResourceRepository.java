@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.task.www.entity.Resource;
@@ -12,6 +13,15 @@ import com.task.www.entity.Resource;
 public interface ResourceRepository extends JpaRepository<Resource, Long> {
 
 	List<Resource> findByIsDeletedFalse();
+
+	@Query("""
+			SELECT DISTINCT r
+			FROM Resource r
+			LEFT JOIN FETCH r.role
+			LEFT JOIN FETCH r.assignmentType
+			WHERE r.isDeleted = false
+			""")
+	List<Resource> findByIsDeletedFalseFetchRoleAndAssignmentType();
 
 	Optional<Resource> findByResourceIdAndIsDeletedFalse(Long id);
 

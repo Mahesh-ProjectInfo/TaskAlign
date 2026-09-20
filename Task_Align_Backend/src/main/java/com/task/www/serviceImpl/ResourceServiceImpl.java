@@ -76,9 +76,29 @@ public class ResourceServiceImpl implements ResourceService {
 
 	// GET ALL
 	@Override
+	@Transactional(readOnly = true)
 	public List<ResourceResponse> getAllResources() {
 
-		return resourceRepository.findByIsDeletedFalse().stream().map(this::mapToResponse).collect(Collectors.toList());
+		List<Resource> resources = resourceRepository.findByIsDeletedFalseFetchRoleAndAssignmentType();
+
+		if (resources.isEmpty()) {
+			return Collections.emptyList();
+		}
+
+		List<Long> resourceIds = resources.stream()
+				.map(Resource::getResourceId)
+				.filter(Objects::nonNull)
+				.collect(Collectors.toList());
+
+		List<ResourceSkill> allResourceSkills = resourceSkillRepository.findByResourceResourceIdIn(resourceIds);
+
+		Map<Long, List<ResourceSkill>> skillsByResourceMap = allResourceSkills.stream()
+				.filter(rs -> rs.getResource() != null && rs.getResource().getResourceId() != null)
+				.collect(Collectors.groupingBy(rs -> rs.getResource().getResourceId()));
+
+		return resources.stream()
+				.map(resource -> mapToResponse(resource, skillsByResourceMap.getOrDefault(resource.getResourceId(), Collections.emptyList())))
+				.collect(Collectors.toList());
 	}
 
 	// GET BY ID
@@ -231,8 +251,14 @@ public class ResourceServiceImpl implements ResourceService {
 
 	}
 
-	// ENTITY TO DTO
+	// ENTITY TO DTO (Single item helper)
 	private ResourceResponse mapToResponse(Resource resource) {
+		List<ResourceSkill> resourceSkills = resourceSkillRepository.findByResourceResourceId(resource.getResourceId());
+		return mapToResponse(resource, resourceSkills);
+	}
+
+	// ENTITY TO DTO (Batch helper)
+	private ResourceResponse mapToResponse(Resource resource, List<ResourceSkill> resourceSkills) {
 
 		ResourceResponse response = new ResourceResponse();
 
@@ -256,21 +282,21 @@ public class ResourceServiceImpl implements ResourceService {
 
 		}
 
-		// Populate Skills via ResourceSkillRepository
-		List<ResourceSkill> resourceSkills = resourceSkillRepository.findByResourceResourceId(resource.getResourceId());
 		List<SkillResponse> skillResponses = new ArrayList<>();
-		for (ResourceSkill rs : resourceSkills) {
-			if (rs.getSkill() != null) {
-				Skill skill = rs.getSkill();
-				SkillResponse sr = new SkillResponse();
-				sr.setSkillId(skill.getSkillId());
-				sr.setSkillName(skill.getSkillName());
-				sr.setIsDeleted(skill.getIsDeleted());
-				if (skill.getAssignmentType() != null) {
-					sr.setAssignmentTypeId(skill.getAssignmentType().getAssignmentTypeId());
-					sr.setAssignmentTypeName(skill.getAssignmentType().getAssignmentTypeName());
+		if (resourceSkills != null) {
+			for (ResourceSkill rs : resourceSkills) {
+				if (rs.getSkill() != null) {
+					Skill skill = rs.getSkill();
+					SkillResponse sr = new SkillResponse();
+					sr.setSkillId(skill.getSkillId());
+					sr.setSkillName(skill.getSkillName());
+					sr.setIsDeleted(skill.getIsDeleted());
+					if (skill.getAssignmentType() != null) {
+						sr.setAssignmentTypeId(skill.getAssignmentType().getAssignmentTypeId());
+						sr.setAssignmentTypeName(skill.getAssignmentType().getAssignmentTypeName());
+					}
+					skillResponses.add(sr);
 				}
-				skillResponses.add(sr);
 			}
 		}
 		response.setSkills(skillResponses);
