@@ -17,7 +17,6 @@ import PageHeader from "@/components/common/PageHeader.jsx";
 import StatCard from "@/components/common/StatCard.jsx";
 import RecentAssignmentsTable from "@/components/dashboard/RecentAssignmentsTable.jsx";
 import { dashboardService } from "@/services/dashboardService.js";
-import { assignmentService } from "@/services/assignmentService.js";
 import AssignmentStatusChart from "@/components/dashboard/AssignmentStatusChart.jsx";
 import AssignmentTypeChart, { resolveAssignmentTypeName } from "@/components/dashboard/AssignmentTypeChart.jsx";
 
@@ -56,56 +55,9 @@ export default function Dashboard() {
     if (showLoading) setLoading(true);
     try {
       const summary = await dashboardService.getSummary();
-      const allAssignments = await assignmentService.getAll().catch(() => []);
 
-      const completedCount = allAssignments.filter((a) => {
-        const st = String(a.assignmentStatus || a.status || "").toUpperCase();
-        return st === "COMPLETED";
-      }).length;
-      const totalCount = allAssignments.length || summary?.cards?.totalAssignments || 0;
-      const draftCount = Math.max(0, totalCount - completedCount);
-
-      const statusChartData = [];
-      if (completedCount > 0) {
-        statusChartData.push({ status: "COMPLETED", count: completedCount });
-      }
-      if (draftCount > 0) {
-        statusChartData.push({ status: "DRAFT", count: draftCount });
-      }
-
-      // Calculate Assignment Type distribution from live assignments
-      const typeCounts = {
-        "Software Project Assignment": 0,
-        "Manufacturing Job Assignment": 0,
-        "Construction Project Assignment": 0,
-        "Sales Region Assignment": 0,
-      };
-
-      allAssignments.forEach((a) => {
-        const rawType = a.assignmentTypeName || a.assignmentType || a.type;
-        const resolvedType = resolveAssignmentTypeName(rawType);
-        if (resolvedType) {
-          typeCounts[resolvedType] = (typeCounts[resolvedType] || 0) + 1;
-        }
-      });
-
-      const liveTypeChartData = Object.entries(typeCounts).map(([type, count]) => ({
-        assignmentType: type,
-        count: count,
-      }));
-
-      setCards({
-        ...(summary?.cards || summary || {}),
-        totalAssignments: totalCount,
-        completedAssignments: completedCount,
-        draftAssignments: draftCount,
-      });
-
-      setCharts({
-        ...(summary?.charts || summary || {}),
-        assignmentStatusChart: statusChartData,
-        assignmentTypeChart: liveTypeChartData,
-      });
+      setCards(summary?.cards || summary || {});
+      setCharts(summary?.charts || summary || {});
     } finally {
       if (showLoading) setLoading(false);
     }

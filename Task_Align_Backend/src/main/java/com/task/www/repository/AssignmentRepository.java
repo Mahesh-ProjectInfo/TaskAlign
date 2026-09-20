@@ -23,7 +23,14 @@ public interface AssignmentRepository extends JpaRepository<Assignment, Long> {
 
     List<Assignment> findByIsDeletedFalse();
 
-    List<Assignment> findByCreatedByAndIsDeletedFalse(String createdBy);
+    @Query("""
+            SELECT a
+            FROM Assignment a
+            LEFT JOIN FETCH a.assignmentType
+            WHERE a.createdBy = :createdBy
+              AND a.isDeleted = false
+            """)
+    List<Assignment> findByCreatedByAndIsDeletedFalse(@Param("createdBy") String createdBy);
 
     Optional<Assignment> findByAssignmentIdAndIsDeletedFalse(
             Long assignmentId);

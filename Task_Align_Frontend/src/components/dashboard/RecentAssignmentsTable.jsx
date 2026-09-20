@@ -24,6 +24,7 @@ export default function RecentAssignmentsTable({
 }) {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [hasError, setHasError] = useState(false);
   const [downloadingId, setDownloadingId] = useState(null);
   const [downloadingType, setDownloadingType] = useState(null);
 
@@ -45,6 +46,7 @@ export default function RecentAssignmentsTable({
   // =========================================================
   const fetchAssignments = async () => {
     setLoading(true);
+    setHasError(false);
 
     try {
       const list = await assignmentService.getAll();
@@ -54,6 +56,7 @@ export default function RecentAssignmentsTable({
         setData(sorted);
       }
     } catch {
+      setHasError(true);
       if (Array.isArray(initialRows)) {
         const sorted = sortNewestFirst(initialRows);
         setData(sorted);
@@ -356,8 +359,12 @@ export default function RecentAssignmentsTable({
       loading={loading}
       keyField="assignmentId"
       maxHeight={maxHeight}
-      emptyTitle={emptyTitle}
-      emptyDescription="There are no assignment records to display."
+      emptyTitle={hasError ? "Failed to load assignments." : emptyTitle}
+      emptyDescription={
+        hasError
+          ? "Unable to retrieve assignment records from server. Please try again."
+          : "There are no assignment records to display."
+      }
     />
   );
 }
