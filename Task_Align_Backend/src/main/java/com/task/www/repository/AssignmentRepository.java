@@ -24,9 +24,10 @@ public interface AssignmentRepository extends JpaRepository<Assignment, Long> {
     List<Assignment> findByIsDeletedFalse();
 
     @Query("""
-            SELECT a
+            SELECT DISTINCT a
             FROM Assignment a
             LEFT JOIN FETCH a.assignmentType
+            LEFT JOIN FETCH a.assignmentConstraint
             WHERE a.createdBy = :createdBy
               AND a.isDeleted = false
             """)
