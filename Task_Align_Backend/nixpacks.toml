@@ -1,0 +1,9 @@
+# Nixpacks configuration for Task Align Backend on Railway
+# Ensures font rendering libraries and headless Java are configured for Apache POI & JasperReports
+
+[phases.setup]
+nixPkgs = ["fontconfig", "dejavu_fonts"]
+
+[variables]
+JAVA_OPTS = "-Djava.awt.headless=true"
+_JAVA_OPTIONS = "-Djava.awt.headless=true"

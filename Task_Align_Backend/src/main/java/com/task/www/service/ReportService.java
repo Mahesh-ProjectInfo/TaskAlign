@@ -4,13 +4,12 @@ import java.util.List;
 
 import com.task.www.entity.ReportHistory;
 
-import jakarta.servlet.http.HttpServletResponse;
 
 public interface ReportService {
 
-    void generateExcelReport(Long assignmentId, HttpServletResponse response);
+    byte[] generateExcelReport(Long assignmentId);
 
-    void generatePdfReport(Long assignmentId, HttpServletResponse response);
+    byte[] generatePdfReport(Long assignmentId);
 
     List<ReportHistory> getReportHistory();
 }

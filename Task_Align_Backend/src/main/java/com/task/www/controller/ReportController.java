@@ -3,12 +3,12 @@ package com.task.www.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import com.task.www.entity.ReportHistory;
 import com.task.www.service.ReportService;
-
-import jakarta.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping("/api/report")
@@ -20,16 +20,36 @@ public class ReportController {
 
 	// Download Excel Report
 	@GetMapping("/excel/{id}")
-	public void downloadExcel(@PathVariable Long id, HttpServletResponse response) {
+	public ResponseEntity<byte[]> downloadExcel(@PathVariable Long id) {
+		byte[] report = reportService.generateExcelReport(id);
 
-		reportService.generateExcelReport(id, response);
+		return ResponseEntity.ok()
+				.header(
+						HttpHeaders.CONTENT_DISPOSITION,
+						"attachment; filename=Assignment_" + id + ".xlsx"
+				)
+				.contentType(
+						MediaType.parseMediaType(
+								"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+						)
+				)
+				.contentLength(report.length)
+				.body(report);
 	}
 
 	// Download PDF Report
 	@GetMapping("/pdf/{id}")
-	public void downloadPdf(@PathVariable Long id, HttpServletResponse response) {
+	public ResponseEntity<byte[]> downloadPdf(@PathVariable Long id) {
+		byte[] report = reportService.generatePdfReport(id);
 
-		reportService.generatePdfReport(id, response);
+		return ResponseEntity.ok()
+				.header(
+						HttpHeaders.CONTENT_DISPOSITION,
+						"attachment; filename=Assignment_" + id + ".pdf"
+				)
+				.contentType(MediaType.APPLICATION_PDF)
+				.contentLength(report.length)
+				.body(report);
 	}
 
 	// Report History

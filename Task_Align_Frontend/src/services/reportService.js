@@ -43,6 +43,15 @@ export const reportService = {
       toast.success(`Report downloaded: ${fileName}`);
       return { ok: true, fileName };
     } catch (err) {
+      if (err.response?.data instanceof Blob) {
+        try {
+          const text = await err.response.data.text();
+          const json = JSON.parse(text);
+          err.response.data = json;
+        } catch {
+          // Fall back to existing error handling
+        }
+      }
       const parsed = parseApiError(err);
       toast.error(parsed.message || "Failed to download Excel report.");
       return { ok: false, error: parsed.message };
@@ -89,6 +98,15 @@ export const reportService = {
       toast.success(`PDF report downloaded: ${fileName}`);
       return { ok: true, fileName };
     } catch (err) {
+      if (err.response?.data instanceof Blob) {
+        try {
+          const text = await err.response.data.text();
+          const json = JSON.parse(text);
+          err.response.data = json;
+        } catch {
+          // Fall back to existing error handling
+        }
+      }
       const parsed = parseApiError(err);
       toast.error(parsed.message || "Failed to download PDF report.");
       return { ok: false, error: parsed.message };

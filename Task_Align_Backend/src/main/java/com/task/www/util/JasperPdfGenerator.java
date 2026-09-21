@@ -10,6 +10,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import jakarta.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.task.www.dto.AssignmentResultDTO;
@@ -28,13 +31,43 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 @Component
 public class JasperPdfGenerator {
 
-    public void generatePdf(AssignmentResultDTO resultDTO, OutputStream outputStream) throws Exception {
-        InputStream jrxmlInput = getClass().getResourceAsStream("/reports/assignment_report.jrxml");
-        if (jrxmlInput == null) {
-            throw new IllegalStateException("Report template /reports/assignment_report.jrxml not found");
-        }
+    private static final Logger log = LoggerFactory.getLogger(JasperPdfGenerator.class);
 
-        JasperReport jasperReport = JasperCompileManager.compileReport(jrxmlInput);
+    private volatile JasperReport cachedJasperReport;
+
+    @PostConstruct
+    public void init() {
+        System.setProperty("java.awt.headless", "true");
+        try {
+            getOrCompileReport();
+            log.info("JasperReport template successfully precompiled and cached at startup.");
+        } catch (Exception e) {
+            log.warn("JasperReport precompilation at startup postponed to first request: {}", e.getMessage());
+        }
+    }
+
+    private JasperReport getOrCompileReport() throws Exception {
+        if (cachedJasperReport == null) {
+            synchronized (this) {
+                if (cachedJasperReport == null) {
+                    long start = System.currentTimeMillis();
+                    try (InputStream jrxmlInput = getClass().getResourceAsStream("/reports/assignment_report.jrxml")) {
+                        if (jrxmlInput == null) {
+                            throw new IllegalStateException("Report template /reports/assignment_report.jrxml not found");
+                        }
+                        cachedJasperReport = JasperCompileManager.compileReport(jrxmlInput);
+                    }
+                    long elapsed = System.currentTimeMillis() - start;
+                    log.info("Jasper report compiled successfully in {} ms", elapsed);
+                }
+            }
+        }
+        return cachedJasperReport;
+    }
+
+    public void generatePdf(AssignmentResultDTO resultDTO, OutputStream outputStream) throws Exception {
+        long startTime = System.currentTimeMillis();
+        JasperReport jasperReport = getOrCompileReport();
 
         boolean isProfit = "PROFIT_MAXIMIZATION".equalsIgnoreCase(resultDTO.getOptimizationType());
         NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(new Locale("en", "IN"));
@@ -84,8 +117,15 @@ public class JasperPdfGenerator {
 
         JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(tableRows);
 
+        long fillStart = System.currentTimeMillis();
         JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
+        long fillElapsed = System.currentTimeMillis() - fillStart;
+        log.info("Jasper report filled in {} ms", fillElapsed);
+
+        long exportStart = System.currentTimeMillis();
         JasperExportManager.exportReportToPdfStream(jasperPrint, outputStream);
+        long exportElapsed = System.currentTimeMillis() - exportStart;
+        log.info("Jasper PDF exported to stream in {} ms (total PDF generation: {} ms)", exportElapsed, (System.currentTimeMillis() - startTime));
     }
 
     private String generateMatrixHtml(MatrixDTO matrix, NumberFormat currencyFormat) {

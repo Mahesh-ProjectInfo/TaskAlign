@@ -1,8 +1,11 @@
 package com.task.www.serviceImpl;
 
+import java.io.ByteArrayOutputStream;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,10 +24,10 @@ import com.task.www.service.OptimizationService;
 import com.task.www.util.ExcelGenerator;
 import com.task.www.util.JasperPdfGenerator;
 
-import jakarta.servlet.http.HttpServletResponse;
-
 @Service
 public class ReportServiceImpl implements ReportService {
+
+    private static final Logger log = LoggerFactory.getLogger(ReportServiceImpl.class);
 
     @Autowired
     private AssignmentRepository assignmentRepository;
@@ -45,8 +48,8 @@ public class ReportServiceImpl implements ReportService {
     private JasperPdfGenerator jasperPdfGenerator;
 
     @Override
-    public void generateExcelReport(Long assignmentId,
-                                    HttpServletResponse response) {
+    public byte[] generateExcelReport(Long assignmentId) {
+        log.info("Starting Excel report generation for assignment {}", assignmentId);
 
         String currentUser = SecurityUtils.getCurrentUser();
         assignmentRepository.findByAssignmentIdAndCreatedByAndIsDeletedFalse(assignmentId, currentUser)
@@ -57,33 +60,24 @@ public class ReportServiceImpl implements ReportService {
         AssignmentResultDTO resultDTO = optimizationService.optimizeAssignment(inputDTO);
 
         String fileName = "Assignment_" + assignmentId + ".xlsx";
-
-        response.setContentType(
-                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-
-        response.setHeader("Content-Disposition",
-                "attachment; filename=" + fileName);
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
         try {
+            excelGenerator.generate(resultDTO, outputStream);
+            byte[] reportBytes = outputStream.toByteArray();
 
-            excelGenerator.generate(
-                    resultDTO,
-                    response.getOutputStream());
-
-            saveReportHistory(
-                    assignmentId,
-                    "EXCEL",
-                    fileName);
-
+            saveReportHistory(assignmentId, "EXCEL", fileName);
+            log.info("Excel report generation completed for assignment {}, size: {} bytes", assignmentId, reportBytes.length);
+            return reportBytes;
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Excel report generation failed for assignment {}", assignmentId, e);
             throw new RuntimeException("Excel generation failed: " + e.getMessage(), e);
         }
-
     }
 
     @Override
-    public void generatePdfReport(Long assignmentId, HttpServletResponse response) {
+    public byte[] generatePdfReport(Long assignmentId) {
+        log.info("Starting PDF report generation for assignment {}", assignmentId);
 
         String currentUser = SecurityUtils.getCurrentUser();
         assignmentRepository.findByAssignmentIdAndCreatedByAndIsDeletedFalse(assignmentId, currentUser)
@@ -94,15 +88,17 @@ public class ReportServiceImpl implements ReportService {
         AssignmentResultDTO resultDTO = optimizationService.optimizeAssignment(inputDTO);
 
         String fileName = "Assignment_" + assignmentId + ".pdf";
-
-        response.setContentType("application/pdf");
-        response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
         try {
-            jasperPdfGenerator.generatePdf(resultDTO, response.getOutputStream());
+            jasperPdfGenerator.generatePdf(resultDTO, outputStream);
+            byte[] reportBytes = outputStream.toByteArray();
+
             saveReportHistory(assignmentId, "PDF", fileName);
+            log.info("PDF report generation completed for assignment {}, size: {} bytes", assignmentId, reportBytes.length);
+            return reportBytes;
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("PDF report generation failed for assignment {}", assignmentId, e);
             throw new RuntimeException("PDF generation failed: " + e.getMessage(), e);
         }
     }

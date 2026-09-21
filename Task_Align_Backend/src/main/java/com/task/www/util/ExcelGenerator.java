@@ -136,9 +136,14 @@ public class ExcelGenerator {
                 }
             }
 
-            // Auto-size columns
-            for (int i = 0; i < (isProfit ? 6 : 5); i++) {
-                sheet.autoSizeColumn(i);
+            // Explicit column widths (avoids Java AWT font metrics dependencies in headless Linux)
+            sheet.setColumnWidth(0, 256 * 28);
+            sheet.setColumnWidth(1, 256 * 28);
+            sheet.setColumnWidth(2, 256 * 22);
+            sheet.setColumnWidth(3, 256 * 16);
+            sheet.setColumnWidth(4, 256 * 18);
+            if (isProfit) {
+                sheet.setColumnWidth(5, 256 * 18);
             }
 
             workbook.write(outputStream);
