@@ -1,0 +1,5 @@
+Task_Align_Backend/target/
+Task_Align_Frontend/
+.git
+.idea
+*.iml
