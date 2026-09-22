@@ -24,7 +24,8 @@ import lombok.Setter;
 @Table(
     name = "tasks",
     indexes = {
-        @Index(name = "idx_tasks_assignment_deleted", columnList = "assignment_id, is_deleted")
+        @Index(name = "idx_tasks_assignment_deleted", columnList = "assignment_id, is_deleted"),
+        @Index(name = "idx_tasks_assignment_name_deleted", columnList = "assignment_id, task_name, is_deleted")
     }
 )
 @Getter

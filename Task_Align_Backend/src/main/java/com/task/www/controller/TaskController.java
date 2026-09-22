@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.task.www.dto.BulkTaskRequest;
+import com.task.www.dto.BulkTaskResponse;
+import com.task.www.dto.BulkTaskSaveRequest;
 import com.task.www.dto.CreateTaskRequest;
 import com.task.www.dto.UpdateTaskRequest;
 import com.task.www.dto.TaskResponse;
@@ -38,6 +41,16 @@ public class TaskController {
             @Valid @RequestBody CreateTaskRequest request) {
 
         TaskResponse response = taskService.createTask(assignmentId, request);
+
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/bulk")
+    public ResponseEntity<List<BulkTaskResponse>> saveBulkTasks(
+            @PathVariable Long assignmentId,
+            @Valid @RequestBody BulkTaskSaveRequest request) {
+
+        List<BulkTaskResponse> response = taskService.saveBulkTasks(assignmentId, request);
 
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }

@@ -44,4 +44,15 @@ export const taskService = {
     const res = await apiClient.delete(`/api/v1/assignments/${assignmentId}/tasks/${taskId}`);
     return res.data;
   },
+
+  /**
+   * Bulk Save/Create Tasks under Assignment
+   * @param {number} assignmentId
+   * @param {Object} payload { tasks: Array<{ taskId?: number, taskName: string, estimatedDays: number, skillIds: Array<number> }> }
+   * @returns {Promise<Array>} List of BulkTaskResponse
+   */
+  async createBulk(assignmentId, payload) {
+    const res = await apiClient.post(`/api/v1/assignments/${assignmentId}/tasks/bulk`, payload);
+    return res.data;
+  },
 };

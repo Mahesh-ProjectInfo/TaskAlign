@@ -329,26 +329,13 @@ export default function CreateAssignment() {
       }
 
       if (step === 3 && assignmentId) {
-        const updatedTasks = [];
-        for (const t of tasks) {
-          const taskName = t.title || t.name || t.taskName;
-          const estimatedDays = Number(t.days || t.estimatedDays) || 1;
+        if (tasks && tasks.length > 0) {
+          const bulkTasksPayload = tasks
+            .map((t) => {
+              const taskName = (t.title || t.name || t.taskName || "").trim();
+              const estimatedDays = Number(t.days || t.estimatedDays) || 1;
+              if (!taskName) return null;
 
-          if (taskName) {
-            let createdTask;
-            if (t.taskId) {
-              createdTask = await taskService
-                .update(assignmentId, t.taskId, { taskName, estimatedDays })
-                .catch(() => null);
-            }
-            if (!createdTask) {
-              createdTask = await taskService
-                .create(assignmentId, { taskName, estimatedDays })
-                .catch(() => null);
-            }
-
-            if (createdTask && createdTask.taskId) {
-              t.taskId = createdTask.taskId;
               const skillNames = t.requiredSkills || t.skills || [];
               const taskSkillIds = skills
                 .filter((s) =>
@@ -361,14 +348,31 @@ export default function CreateAssignment() {
                 .map((s) => s.skillId);
               const uniqueSkillIds = Array.from(new Set(taskSkillIds));
 
-              await taskSkillService
-                .update(createdTask.taskId, { skillIds: uniqueSkillIds })
-                .catch(() => null);
-            }
-            updatedTasks.push(t);
+              return {
+                taskId: typeof t.taskId === "number" ? t.taskId : null,
+                taskName,
+                estimatedDays,
+                skillIds: uniqueSkillIds,
+              };
+            })
+            .filter(Boolean);
+
+          if (bulkTasksPayload.length > 0) {
+            const bulkResponses = await taskService.createBulk(assignmentId, {
+              tasks: bulkTasksPayload,
+            });
+
+            // Map returned saved tasks back to draft tasks
+            const updatedTasks = tasks.map((t) => {
+              const taskName = (t.title || t.name || t.taskName || "").trim();
+              const saved = (bulkResponses || []).find(
+                (r) => r.taskName?.trim().toLowerCase() === taskName.toLowerCase(),
+              );
+              return saved && saved.taskId ? { ...t, taskId: saved.taskId } : t;
+            });
+            update({ tasks: updatedTasks });
           }
         }
-        update({ tasks: updatedTasks });
       }
 
       if (step === 4 && assignmentId) {

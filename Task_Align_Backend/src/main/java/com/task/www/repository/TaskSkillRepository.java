@@ -14,5 +14,9 @@ public interface TaskSkillRepository extends JpaRepository<TaskSkill, Long> {
 
     List<TaskSkill> findByTaskTaskId(Long taskId);
 
+    List<TaskSkill> findByTaskTaskIdIn(List<Long> taskIds);
+
     List<TaskSkill> findByTaskTaskIdAndSkillIdIn(Long taskId, List<Long> skillIds);
+
+    void deleteByTaskTaskIdIn(List<Long> taskIds);
 }
