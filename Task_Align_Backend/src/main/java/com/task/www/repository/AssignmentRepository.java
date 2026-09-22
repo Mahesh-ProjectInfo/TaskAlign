@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.task.www.dto.AssignmentStatusChartResponse;
+import com.task.www.dto.AssignmentStatusSummaryDto;
 import com.task.www.dto.AssignmentTypeChartResponse;
 import com.task.www.dto.MonthlyAssignmentChartResponse;
 import com.task.www.entity.Assignment;
@@ -68,6 +69,18 @@ public interface AssignmentRepository extends JpaRepository<Assignment, Long> {
 
     long countByAssignmentStatusAndCreatedByAndIsDeletedFalse(
             AssignmentStatus assignmentStatus, String createdBy);
+
+    @Query("""
+            SELECT new com.task.www.dto.AssignmentStatusSummaryDto(
+                COUNT(a),
+                COALESCE(SUM(CASE WHEN a.assignmentStatus = com.task.www.enums.AssignmentStatus.DRAFT THEN 1L ELSE 0L END), 0L),
+                COALESCE(SUM(CASE WHEN a.assignmentStatus = com.task.www.enums.AssignmentStatus.COMPLETED THEN 1L ELSE 0L END), 0L)
+            )
+            FROM Assignment a
+            WHERE a.createdBy = :createdBy
+              AND a.isDeleted = false
+            """)
+    AssignmentStatusSummaryDto getAssignmentStatusSummaryByCreatedBy(@Param("createdBy") String createdBy);
 
 
     // =========================================================

@@ -4,7 +4,12 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "report_history")
+@Table(
+    name = "report_history",
+    indexes = {
+        @Index(name = "idx_reports_generated_deleted", columnList = "generated_by, is_deleted")
+    }
+)
 @Getter
 @Setter
 @NoArgsConstructor

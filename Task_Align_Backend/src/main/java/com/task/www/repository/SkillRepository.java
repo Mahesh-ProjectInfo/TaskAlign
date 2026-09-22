@@ -15,6 +15,8 @@ public interface SkillRepository extends JpaRepository<Skill, Long> {
 
     List<Skill> findByIsDeletedFalse();
 
+    long countByIsDeletedFalse();
+
     Optional<Skill> findBySkillIdAndIsDeletedFalse(Long skillId);
 
     List<Skill> findByAssignmentTypeAssignmentTypeIdAndIsDeletedFalse(Long assignmentTypeId);

@@ -14,6 +14,8 @@ public interface ResourceRepository extends JpaRepository<Resource, Long> {
 
 	List<Resource> findByIsDeletedFalse();
 
+	long countByIsDeletedFalse();
+
 	@Query("""
 			SELECT DISTINCT r
 			FROM Resource r

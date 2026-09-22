@@ -12,7 +12,14 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "assignments")
+@Table(
+    name = "assignments",
+    indexes = {
+        @Index(name = "idx_assignments_created_deleted", columnList = "created_by, is_deleted"),
+        @Index(name = "idx_assignments_created_deleted_status", columnList = "created_by, is_deleted, assignment_status"),
+        @Index(name = "idx_assignments_created_deleted_type", columnList = "created_by, is_deleted, assignment_type_id")
+    }
+)
 @Getter
 @Setter
 @NoArgsConstructor

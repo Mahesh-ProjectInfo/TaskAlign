@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.task.www.config.SecurityUtils;
 import com.task.www.dto.ApiResponse;
 import com.task.www.dto.AssignmentStatusChartResponse;
+import com.task.www.dto.AssignmentStatusSummaryDto;
 import com.task.www.dto.AssignmentTypeChartResponse;
 import com.task.www.dto.DashboardCardResponse;
 import com.task.www.dto.DashboardChartResponse;
@@ -71,18 +72,17 @@ public class DashboardServiceImpl implements DashboardService {
 
         String currentUser = SecurityUtils.getCurrentUser();
 
-        Long totalAssignments =
-                assignmentRepository.countByCreatedByAndIsDeletedFalse(currentUser);
+        AssignmentStatusSummaryDto assignmentSummary =
+                assignmentRepository.getAssignmentStatusSummaryByCreatedBy(currentUser);
 
-        Long draftAssignments =
-                assignmentRepository
-                        .countByAssignmentStatusAndCreatedByAndIsDeletedFalse(
-                                AssignmentStatus.DRAFT, currentUser);
+        Long totalAssignments = (assignmentSummary != null && assignmentSummary.getTotalAssignments() != null)
+                ? assignmentSummary.getTotalAssignments() : 0L;
 
-        Long completedAssignments =
-                assignmentRepository
-                        .countByAssignmentStatusAndCreatedByAndIsDeletedFalse(
-                                AssignmentStatus.COMPLETED, currentUser);
+        Long draftAssignments = (assignmentSummary != null && assignmentSummary.getDraftAssignments() != null)
+                ? assignmentSummary.getDraftAssignments() : 0L;
+
+        Long completedAssignments = (assignmentSummary != null && assignmentSummary.getCompletedAssignments() != null)
+                ? assignmentSummary.getCompletedAssignments() : 0L;
 
         /*
          * Current AssignmentStatus enum contains only:
@@ -95,11 +95,11 @@ public class DashboardServiceImpl implements DashboardService {
 
         Long activeAssignments = 0L;
 
-        Long totalRoles = roleRepository.count();
+        Long totalRoles = roleRepository.countByIsDeletedFalse();
 
-        Long totalSkills = skillRepository.count();
+        Long totalSkills = skillRepository.countByIsDeletedFalse();
 
-        Long totalResources = resourceRepository.count();
+        Long totalResources = resourceRepository.countByIsDeletedFalse();
 
         Long totalTasks = taskRepository.countByAssignmentCreatedByAndIsDeletedFalse(currentUser);
 

@@ -15,6 +15,8 @@ public interface RoleRepository extends JpaRepository<Role, Long> {
 
     List<Role> findByIsDeletedFalse();
 
+    long countByIsDeletedFalse();
+
     Optional<Role> findByRoleIdAndIsDeletedFalse(Long roleId);
 
     List<Role> findByAssignmentTypeAssignmentTypeIdAndIsDeletedFalse(Long assignmentTypeId);
